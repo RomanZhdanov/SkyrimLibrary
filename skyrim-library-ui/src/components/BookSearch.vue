@@ -8,7 +8,7 @@
   <div v-if="message">{{ message }}</div>
   <ul v-if="results">
     <li v-for="book in results" :key="book.id">
-      {{ book.title }}
+      <RouterLink :to="detailsLink(book.id)">{{ book.title }}</RouterLink>
     </li>
   </ul>
 </template>
@@ -49,6 +49,9 @@ export default defineComponent({
         }
         this.results = {} as BookItem[]
       }
+    },
+    detailsLink(id: string) {
+      return '/books/' + id
     }
   }
 })
