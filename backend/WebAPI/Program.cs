@@ -5,6 +5,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddSingleton<BooksDb>();
 
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy("frontend-origins", corsBuilder => corsBuilder
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .WithOrigins(builder.Configuration.GetSection("CorsOrigins").Get<string[]>())
+        .AllowCredentials());
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -33,6 +42,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("frontend-origins");
 app.UseHttpsRedirection();
 
 app.Run();
