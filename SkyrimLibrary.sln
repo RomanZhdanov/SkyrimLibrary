@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookFetcher", "BookFetcher\BookFetcher.csproj", "{9C2A2159-9D53-4DAD-80C8-5DDCB9C106A9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI", "WebAPI\WebAPI.csproj", "{99D46839-2C53-423F-93F8-EE1B4891F93B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{9C2A2159-9D53-4DAD-80C8-5DDCB9C106A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C2A2159-9D53-4DAD-80C8-5DDCB9C106A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C2A2159-9D53-4DAD-80C8-5DDCB9C106A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99D46839-2C53-423F-93F8-EE1B4891F93B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99D46839-2C53-423F-93F8-EE1B4891F93B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99D46839-2C53-423F-93F8-EE1B4891F93B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99D46839-2C53-423F-93F8-EE1B4891F93B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
