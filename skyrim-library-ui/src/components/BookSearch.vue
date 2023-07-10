@@ -5,6 +5,7 @@
     type="text"
     placeholder="search book by title"
   />
+  <div v-if="message">{{ message }}</div>
   <ul v-if="results">
     <li v-for="book in results" :key="book.id">
       {{ book.title }}
@@ -16,18 +17,19 @@
 import * as api from '@/api'
 import { defineComponent } from 'vue'
 import type { BookItem } from '@/types/bookTypes'
+import type { AxiosError } from 'axios'
 
 export default defineComponent({
   data() {
     return {
       searchInput: '',
+      message: '',
       results: {} as BookItem[]
     }
   },
   watch: {
     searchInput() {
       if (this.searchInput.length > 2) {
-        console.log('now we can search')
         this.searchBooks()
       } else {
         this.results = {} as BookItem[]
@@ -36,8 +38,17 @@ export default defineComponent({
   },
   methods: {
     async searchBooks() {
-      const { data } = await api.search(this.searchInput)
-      this.results = data
+      try {
+        const { data } = await api.search(this.searchInput)
+        this.message = ''
+        this.results = data
+      } catch (err: unknown) {
+        const error = err as AxiosError
+        if (error.response) {
+          this.message = error.response.data as string
+        }
+        this.results = {} as BookItem[]
+      }
     }
   }
 })
