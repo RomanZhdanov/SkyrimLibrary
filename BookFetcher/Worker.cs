@@ -1,18 +1,17 @@
 using HtmlAgilityPack;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace BookFetcher;
 
-public class Worker : BackgroundService
+internal class Worker : BackgroundService
 {
     private readonly ILogger<Worker> _logger;
+    private readonly BooksParser _booksParser;
 
-    private string _baseURL = "https://en.uesp.net";
-
-    public Worker(ILogger<Worker> logger)
+    public Worker(ILogger<Worker> logger, BooksParser booksParser)
     {
         _logger = logger;
+        _booksParser = booksParser;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -22,7 +21,7 @@ public class Worker : BackgroundService
             _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
             var books = new List<BookItem>();
 
-            var html = await GetHtmlPageAsync(_baseURL + "/wiki/Skyrim:Books");
+            var html = await _booksParser.GetHtmlPageAsync("/wiki/Skyrim:Books");
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
 
@@ -34,14 +33,13 @@ public class Worker : BackgroundService
             {
                 try
                 {
-                    // var links = bookRows[i].SelectNodes(".//a");
                     var imageLink = bookRows[i].SelectSingleNode(".//td[1]//a[1]");
                     var imageUrl = imageLink.GetAttributeValue("href", "");
-                    var coverImage = await GetBookCoverImageAsync(imageUrl);
+                    var coverImage = await _booksParser.GetBookCoverImageAsync(imageUrl);
                     var bookLink = bookRows[i].SelectSingleNode(".//td[2]//a[1]");
                     var bookUrl = bookLink.GetAttributeValue("href", "");
                     var title = bookLink?.InnerText;
-                    var text = await GetBookTextAsync(bookUrl);
+                    var text = await _booksParser.GetBookTextAsync(bookUrl);
                     var id = bookRows[i].SelectSingleNode(".//span[@class='idall']").InnerText;
                     var author = bookRows[i].SelectSingleNode(".//td[4]")?.InnerText;
                     var description = bookRows[i].SelectSingleNode(".//td[5]")?.InnerText;
@@ -72,69 +70,9 @@ public class Worker : BackgroundService
         }
     }
 
-    private async Task<string> GetHtmlPageAsync(string url)
-    {
-        using var client = new HttpClient();
 
-        var response = await client.GetAsync(url);
 
-        return await response.Content.ReadAsStringAsync();
-    }
 
-    private async Task<string> GetBookCoverImageAsync(string coverUrl)
-    {
-        var coverHtml = await GetHtmlPageAsync(_baseURL + coverUrl);
-        var doc = new HtmlDocument();
-        doc.LoadHtml(coverHtml);
 
-        var imageUrl = doc.DocumentNode.SelectSingleNode("//div[@class='fullImageLink']//a").GetAttributeValue("href", "");
 
-        var fileName = imageUrl.Split('/').Last();
-
-        await DownloadImageAsync("https:" + imageUrl, fileName);
-
-        return fileName;
-    }
-
-    private async Task DownloadImageAsync(string imageUrl, string fileName)
-    {
-        var folder = "Files/Covers";
-
-        if (!Directory.Exists(folder))
-            Directory.CreateDirectory(folder);
-
-        if (File.Exists($"{folder}/{fileName}"))
-            return;
-
-        using (HttpClient client = new HttpClient())
-        {
-            try
-            {
-                byte[] imageData = await client.GetByteArrayAsync(imageUrl);
-
-                if (!Directory.Exists("Covers"))
-                    Directory.CreateDirectory("Covers");
-
-                // Save the image data to a file
-                await System.IO.File.WriteAllBytesAsync("Covers/" + fileName, imageData);
-
-                Console.WriteLine("Image downloaded successfully.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error occurred while downloading the image: " + ex.Message);
-            }
-        }
-    }
-
-    private async Task<string> GetBookTextAsync(string bookUrl)
-    {
-        var bookHtml = await GetHtmlPageAsync(_baseURL + bookUrl);
-        var doc = new HtmlDocument();
-        doc.LoadHtml(bookHtml);
-
-        var book = doc.DocumentNode.SelectSingleNode("//div[@class='book']")?.InnerHtml;
-
-        return book;
-    }
 }
