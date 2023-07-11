@@ -20,7 +20,7 @@ public class BooksDb
         return books.SingleOrDefault(b => b.Id == id);
     }
 
-    public IEnumerable<BookDTO> Find(string text)
+    public IList<BookDTO> Find(string text)
     {
         return books.Where(b => b.Title.ToLower().Contains(text.ToLower()))
             .Select(b => new BookDTO
@@ -31,10 +31,10 @@ public class BooksDb
                 Author = b.Author,
                 Type = b.Type,
                 CoverImage = b.CoverImage,
-            });
+            }).ToList();
     }
 
-    public IEnumerable<BookDTO> GetPage(int page, int pageSize)
+    public IList<BookDTO> GetPage(int page, int pageSize)
     {
         int startIndex = (page - 1) * pageSize;
 
@@ -48,6 +48,6 @@ public class BooksDb
                 Author = b.Author,
                 Type = b.Type,
                 CoverImage = b.CoverImage,
-            });
+            }).ToList();
     }
 }

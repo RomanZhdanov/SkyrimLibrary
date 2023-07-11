@@ -26,11 +26,19 @@ app.MapGet("/books/", (int page, int pageSize, BooksDb booksDb) =>
 app.MapGet("/books/{id}", (string id, BooksDb booksDb) =>
     booksDb.GetBook(id));
 
-app.MapGet("/search/", (string input, BooksDb booksDb) =>
+app.MapGet("/search/", (string input, BooksDb booksDb, HttpContext context) =>
 {
     var result = booksDb.Find(input);
 
     if (!result.Any()) return Results.NotFound($"Not found anything on '{input}'");
+
+    var baseURL = context.Request.Host;
+    var scheme = context.Request.Scheme;
+
+    foreach (var book in result)
+    {
+        book.CoverImage = $"{scheme}://{baseURL}/covers/{book.CoverImage}";
+    }
 
     return Results.Ok(result);
 });
@@ -44,5 +52,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("frontend-origins");
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 
 app.Run();
