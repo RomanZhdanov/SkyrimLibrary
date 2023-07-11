@@ -1,5 +1,6 @@
 using SkyrimLibrary.WebAPI.DTO;
 using SkyrimLibrary.WebAPI.Models;
+using SkyrimLibrary.WebAPI.Utils;
 using System.Text.Json;
 
 namespace SkyrimLibrary.WebAPI.Data;
@@ -13,6 +14,11 @@ public class BooksDb
         string fileName = "Data/SkyrimBooks.json";
         string jsonString = File.ReadAllText(fileName);
         books = JsonSerializer.Deserialize<List<Book>>(jsonString)!;
+
+        foreach (var book in books)
+        {
+            book.Text = book.Text.RemoveLinks();
+        }
     }
 
     public Book? GetBook(string id)
