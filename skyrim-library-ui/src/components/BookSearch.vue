@@ -9,14 +9,18 @@
   </div>
   <div v-if="message">{{ message }}</div>
   <div v-if="results">
-    <RouterLink :to="detailsLink(book.id)" v-for="book in results" :key="book.id" class="book-card">
-      <BookListItem
-        :id="book.id"
-        :title="book.title"
-        :description="book.description"
-        :cover-url="book.coverImage"
-      />
-    </RouterLink>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
+      <div class="col" v-for="book in results" :key="book.id">
+        <RouterLink :to="detailsLink(book.id)" class="book-card">
+          <BookListItem
+            :id="book.id"
+            :title="book.title"
+            :description="book.description"
+            :cover-url="book.coverImage"
+          />
+        </RouterLink>
+      </div>
+    </div>
   </div>
 </template>
 

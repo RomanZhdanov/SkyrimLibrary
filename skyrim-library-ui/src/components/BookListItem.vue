@@ -1,5 +1,14 @@
 <template>
-  <div class="card mb-3">
+  <div class="card">
+    <img :src="coverUrl" class="card-img-top" alt="cover" />
+    <div class="card-body">
+      <h5 class="card-title">{{ title }}</h5>
+      <p class="card-text">
+        <small class="text-body-secondary">{{ description }}</small>
+      </p>
+    </div>
+  </div>
+  <!-- <div class="card mb-3">
     <div class="card-body">
       <div class="d-flex">
         <div class="flex-shrink-0">
@@ -13,7 +22,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 </template>
 
 <script lang="ts">
