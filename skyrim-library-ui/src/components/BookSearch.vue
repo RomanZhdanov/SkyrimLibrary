@@ -8,26 +8,27 @@
     />
   </div>
   <div v-if="message">{{ message }}</div>
-  <div v-if="results">
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
-      <div class="col" v-for="book in results" :key="book.id">
-        <RouterLink :to="detailsLink(book.id)" class="book-card">
-          <BookListItem
-            :id="book.id"
-            :title="book.title"
-            :description="book.description"
-            :cover-url="book.coverImage"
-          />
-        </RouterLink>
-      </div>
+  <div v-if="books">
+    <p>Found {{ booksCount }} books</p>
+    <!-- <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3"> -->
+    <div class="col" v-for="book in books" :key="book.id">
+      <RouterLink :to="detailsLink(book.id)" class="book-card">
+        <BookListItem
+          :id="book.id"
+          :title="book.title"
+          :description="book.description"
+          :cover-url="book.coverImage"
+        />
+      </RouterLink>
     </div>
+    <!-- </div> -->
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useBookSearchStore } from '@/stores/bookSearch'
-import type { BookItem } from '@/types/bookTypes'
+import type { BookItem, BookSearchResult } from '@/types/bookTypes'
 import BookListItem from '@/components/BookListItem.vue'
 
 export default defineComponent({
@@ -42,17 +43,20 @@ export default defineComponent({
     }
   },
   computed: {
-    results(): BookItem[] {
-      return this.searchStore.results
+    books(): BookItem[] {
+      return this.searchStore.result.items
+    },
+    booksCount(): number {
+      return this.searchStore.result.itemsCount
     }
   },
   watch: {
     searchInput() {
-      if (this.searchInput.length > 2) {
+      if (this.searchInput.length > 0) {
         this.searchBooks()
       } else {
         this.searchStore.searchInput = ''
-        this.searchStore.results = {} as BookItem[]
+        this.searchStore.result = {} as BookSearchResult
       }
     }
   },

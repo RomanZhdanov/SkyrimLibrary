@@ -21,6 +21,11 @@ public class BooksDb
         }
     }
 
+    public int Count()
+    {
+        return books.Count();
+    }
+
     public Book? GetBook(string id)
     {
         return books.SingleOrDefault(b => b.Id == id);
@@ -44,7 +49,8 @@ public class BooksDb
     {
         int startIndex = (page - 1) * pageSize;
 
-        return books.Skip(startIndex)
+        return books.OrderBy(b => b.Title)
+            .Skip(startIndex)
             .Take(pageSize)
             .Select(b => new BookDTO
             {

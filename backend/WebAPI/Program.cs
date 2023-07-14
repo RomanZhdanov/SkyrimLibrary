@@ -1,4 +1,6 @@
 using SkyrimLibrary.WebAPI.Data;
+using SkyrimLibrary.WebAPI.DTO;
+using SkyrimLibrary.WebAPI.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +23,12 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 app.MapGet("/books/", (int page, int pageSize, BooksDb booksDb) =>
-    booksDb.GetPage(page, pageSize));
+{ 
+    var count = booksDb.Count();
+    var books = booksDb.GetPage(page, pageSize);
+
+    return Results.Ok(new PaginatedList<BookDTO>(books, count, page, pageSize));
+});
 
 app.MapGet("/books/{id}", (string id, BooksDb booksDb) =>
     booksDb.GetBook(id));
@@ -40,7 +47,11 @@ app.MapGet("/search/", (string input, BooksDb booksDb, HttpContext context) =>
         book.CoverImage = $"{scheme}://{baseURL}/covers/{book.CoverImage}";
     }
 
-    return Results.Ok(result);
+    return Results.Ok(new SearchResult<BookDTO>
+    {
+        Items = result,
+        ItemsCount = result.Count
+    });
 });
 
 // Configure the HTTP request pipeline.

@@ -1,19 +1,19 @@
 import { defineStore } from 'pinia'
 import * as api from '@/api'
-import type { BookItem } from '@/types/bookTypes'
+import type { BookSearchResult } from '@/types/bookTypes'
 import type { AxiosError } from 'axios'
 
 export const useBookSearchStore = defineStore('bookSearch', {
   state: () => ({
     searchInput: '',
-    results: {} as BookItem[]
+    result: {} as BookSearchResult
   }),
   actions: {
     async searchBooks(input: string) {
       this.searchInput = input
       try {
         const { data } = await api.search(input)
-        this.results = data
+        this.result = data
       } catch (err: unknown) {
         const error = err as AxiosError
         let message = 'There was an exception during search...'
@@ -22,7 +22,7 @@ export const useBookSearchStore = defineStore('bookSearch', {
           message = error.response.data as string
         }
 
-        this.results = {} as BookItem[]
+        this.result = {} as BookSearchResult
         throw new Error(message)
       }
     }
