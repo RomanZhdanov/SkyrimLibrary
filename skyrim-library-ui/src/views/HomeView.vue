@@ -4,7 +4,7 @@ import BookSearch from '../components/BookSearch.vue'
 
 <template>
   <div class="text-center mb-4">
-    <h1 class="display-1">Skyrim Library</h1>
+    <h1 class="display-5">Welcome to Skyrim Library</h1>
   </div>
   <BookSearch />
 </template>
