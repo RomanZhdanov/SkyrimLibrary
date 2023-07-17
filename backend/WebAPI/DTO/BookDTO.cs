@@ -12,6 +12,8 @@
 
         public string Type { get; set; }
 
+        public string Snippets { get; set; }
+
         public string CoverImage { get; set; }
     }
 }

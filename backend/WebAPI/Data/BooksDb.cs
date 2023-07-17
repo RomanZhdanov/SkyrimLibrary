@@ -21,6 +21,11 @@ public class BooksDb
         }
     }
 
+    public IEnumerable<Book> GetAll()
+    {
+        return books;
+    }
+
     public int Count()
     {
         return books.Count();

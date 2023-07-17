@@ -4,6 +4,18 @@ namespace SkyrimLibrary.WebAPI.Utils
 {
     public static class HtmlUtils
     {
+        public static string ToStripHtml(this string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return string.Empty;
+
+            HtmlDocument htmlDoc = new HtmlDocument();
+
+            htmlDoc.LoadHtml(text);
+
+            return htmlDoc.DocumentNode.InnerText;
+        }
+
         public static string RemoveLinks(this string html)
         {
             if (string.IsNullOrEmpty(html)) return string.Empty;

@@ -16,6 +16,7 @@
         <BookListItem
           :id="book.id"
           :title="book.title"
+          :snippets="book.snippets"
           :description="book.description"
           :cover-url="book.coverImage"
         />

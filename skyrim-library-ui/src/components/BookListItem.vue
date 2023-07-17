@@ -15,10 +15,9 @@
           <img :src="coverUrl" alt="cover" style="width: 60px" />
         </div>
         <div class="flex-grow-1 ms-3">
-          <h5 class="card-title">{{ title }}</h5>
-          <p class="card-text">
-            {{ description }}
-          </p>
+          <h5 class="card-title" v-html="title"></h5>
+          <p class="card-text text-secondary" v-html="description"></p>
+          <p class="card-text" v-if="snippets" v-html="snippets"></p>
         </div>
       </div>
     </div>
@@ -35,6 +34,10 @@ export default defineComponent({
       required: true
     },
     title: {
+      type: String,
+      required: true
+    },
+    snippets: {
       type: String,
       required: true
     },

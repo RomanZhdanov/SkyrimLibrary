@@ -18,4 +18,8 @@
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\ReindexerSharp\ReindexerSharp\ReindexerSharp.csproj" />
+  </ItemGroup>
+
 </Project>

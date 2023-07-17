@@ -18,6 +18,7 @@ export interface BookItem {
   description: string
   author: string
   type: string
+  snippets: string
   coverImage: string
 }
 
