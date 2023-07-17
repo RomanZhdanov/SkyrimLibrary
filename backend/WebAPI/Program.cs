@@ -1,5 +1,4 @@
 using ReindexerClient;
-using SkyrimLibrary.WebAPI.Data;
 using SkyrimLibrary.WebAPI.DTO;
 using SkyrimLibrary.WebAPI.Models;
 using SkyrimLibrary.WebAPI.Services;
@@ -10,6 +9,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<BooksDb>();
 builder.Services.AddReindexer();
 builder.Services.AddTransient<SearchService>();
+builder.Services.AddTransient<Worker>();
+builder.Services.AddTransient<BooksParser>();
+builder.Services.AddHttpClient<BooksParser>(client =>
+{
+    client.BaseAddress = new Uri("https://en.uesp.net");
+});
 
 builder.Services.AddCors(opt =>
 {
@@ -29,40 +34,14 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    var logger = services.GetRequiredService<ILogger<Program>>();
+    var worker = services.GetRequiredService<Worker>();
 
     try
     {
-        var searchService = services.GetRequiredService<SearchService>();
-        var booksDb = services.GetRequiredService<BooksDb>();
-
-        if (searchService is null)
-            throw new Exception("SearchService was not found!");
-
-        var result = await searchService.Initialize();
-        
-        if (!result.Succeeded)
-        {
-            logger.LogWarning("Неудачная инициализация поисковой службы:", String.Join(" ", result.Errors));
-            return;
-        }
-
-        var books = booksDb.GetAll().Select(b => new BookSearchItem
-        {
-            Id = b.Id,
-            Title = b.Title,
-            Text = b.Text,
-            Author  = b.Author,
-            Description = b.Description,
-            CoverImage = b.CoverImage
-        }).ToList();
-
-        await searchService.AddManyBooksAsync(books);
+        await worker.Run();
     }
     catch (Exception ex)
     {
-        logger.LogError(ex, "Во время инициализации поисковой службы возникло исключение!");
-
         throw;
     }
 }
@@ -94,7 +73,7 @@ app.MapGet("/search/", async (string input, SearchService searchService, HttpCon
         Snippets = b.Text.Contains("<mark>") ? b.Text : null,
         Author = b.Author,
         Description = b.Description,
-        CoverImage = $"{scheme}://{baseURL}/covers/{b.CoverImage}"
+        CoverImage = $"{scheme}://{baseURL}/img/covers/thumb/{b.CoverImage}"
     });
 
     return Results.Ok(new SearchResult<BookDTO>

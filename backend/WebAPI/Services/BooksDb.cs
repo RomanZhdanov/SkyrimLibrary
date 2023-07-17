@@ -3,7 +3,7 @@ using SkyrimLibrary.WebAPI.Models;
 using SkyrimLibrary.WebAPI.Utils;
 using System.Text.Json;
 
-namespace SkyrimLibrary.WebAPI.Data;
+namespace SkyrimLibrary.WebAPI.Services;
 
 public class BooksDb
 {
@@ -11,7 +11,7 @@ public class BooksDb
 
     public BooksDb()
     {
-        string fileName = "Data/SkyrimBooks.json";
+        string fileName = "wwwroot/data/SkyrimBooks.json";
         string jsonString = File.ReadAllText(fileName);
         books = JsonSerializer.Deserialize<List<Book>>(jsonString)!;
 
