@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using ReindexerClient;
 using SkyrimLibrary.WebAPI.Data;
 using SkyrimLibrary.WebAPI.DTO;
@@ -55,6 +54,7 @@ using (var scope = app.Services.CreateScope())
             Text = b.Text,
             Author  = b.Author,
             Description = b.Description,
+            CoverImage = b.CoverImage
         }).ToList();
 
         await searchService.AddManyBooksAsync(books);
