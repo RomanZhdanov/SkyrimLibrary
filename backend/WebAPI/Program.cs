@@ -46,16 +46,48 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-app.MapGet("/books/", (int page, int pageSize, BooksDb booksDb) =>
-{ 
+app.MapGet("/books/", (int page, int pageSize, BooksDb booksDb, HttpContext context) =>
+{
+    var baseURL = context.Request.Host;
+    var scheme = context.Request.Scheme;
+
     var count = booksDb.Count();
     var books = booksDb.GetPage(page, pageSize);
+
+    foreach (var book in books)
+    {
+        book.CoverImage = $"{scheme}://{baseURL}/img/covers/thumb/{book.CoverImage}";
+    }
 
     return Results.Ok(new PaginatedList<BookDTO>(books, count, page, pageSize));
 });
 
 app.MapGet("/books/{id}", (string id, BooksDb booksDb) =>
-    booksDb.GetBook(id));
+{
+    var book = booksDb.GetBook(id);
+    
+    if (book is null) return Results.NotFound();
+
+    return Results.Ok(book);
+});
+
+app.MapGet("/books/{id}/details", (string id, HttpContext context, BooksDb booksDb) =>
+{
+    var baseURL = context.Request.Host;
+    var scheme = context.Request.Scheme;
+    var book = booksDb.GetBook(id);
+
+    if (book is null) return Results.NotFound();
+
+    return Results.Ok(new BookDTO
+    {
+        Id = book.Id,
+        Title = book.Title,
+        Author = book.Author,
+        Description = book.Description,
+        CoverImage = $"{scheme}://{baseURL}/img/covers/{book.CoverImage}"
+    });
+});
 
 app.MapGet("/search/", async (string input, SearchService searchService, HttpContext context) =>
 {

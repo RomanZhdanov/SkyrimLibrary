@@ -22,10 +22,16 @@ export interface BookItem {
   coverImage: string
 }
 
+export interface Book {
+  id: string
+  title: string
+  author: string
+  text: string
+}
+
 export interface BookDetails {
   id: string
   title: string
-  text: string
   description: string
   author: string
   type: string

@@ -1,12 +1,10 @@
 <template>
   <div v-if="book">
-    <BookCard
-      :id="book.id"
-      :title="book.title"
-      :author="book.author"
-      :description="book.description"
-      :cover-src="book.coverImage"
-    />
+    <div class="text-center">
+      <h1>{{ book.title }}</h1>
+      <p v-if="book.author">by {{ book.author }}</p>
+    </div>
+    <div v-html="book.text" />
   </div>
   <div v-else="error">{{ error }}</div>
   <div v-else>Loading...</div>
@@ -15,8 +13,7 @@
 <script lang="ts">
 import * as api from '@/api'
 import { defineComponent } from 'vue'
-import BookCard from '@/components/BookCard.vue'
-import type { BookDetails } from '@/types/bookTypes'
+import type { Book } from '@/types/bookTypes'
 import type { AxiosError } from 'axios'
 
 export default defineComponent({
@@ -26,19 +23,16 @@ export default defineComponent({
       required: true
     }
   },
-  components: {
-    BookCard
-  },
   data() {
     return {
-      book: {} as BookDetails,
+      book: {} as Book,
       error: ''
     }
   },
   methods: {
     async loadBook() {
       try {
-        const { data } = await api.getDetails(this.id)
+        const { data } = await api.get(this.id)
         this.book = data
       } catch (err: unknown) {
         const error = err as AxiosError

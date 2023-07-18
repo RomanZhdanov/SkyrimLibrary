@@ -1,6 +1,7 @@
 using SkyrimLibrary.WebAPI.DTO;
 using SkyrimLibrary.WebAPI.Models;
 using SkyrimLibrary.WebAPI.Utils;
+using System.Net.WebSockets;
 using System.Text.Json;
 
 namespace SkyrimLibrary.WebAPI.Services;
@@ -33,7 +34,7 @@ public class BooksDb
 
     public Book? GetBook(string id)
     {
-        return books.SingleOrDefault(b => b.Id == id);
+        return  books.SingleOrDefault(b => b.Id == id);
     }
 
     public IList<BookDTO> Find(string text)
