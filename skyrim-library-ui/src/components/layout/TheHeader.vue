@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <nav class="navbar navbar-expand-lg bg-body-tertiary shadow">
     <div class="container">
       <router-link class="navbar-brand" to="/">Skyrim Library</router-link>
       <button

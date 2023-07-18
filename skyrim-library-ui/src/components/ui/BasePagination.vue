@@ -1,17 +1,17 @@
 <template>
   <nav aria-label="Page navigation example">
     <ul class="pagination">
-      <li v-if="hasPrevious" class="page-item">
+      <li v-if="hasPrevious" class="page-item shadow">
         <a class="page-link" href="#" @click="prevPage">Previous</a>
       </li>
-      <li class="page-item" v-if="showFirstPage">
+      <li class="page-item shadow" v-if="showFirstPage">
         <a class="page-link" href="#" @click="pageClick(1)">1</a>
       </li>
       <li class="page-item disabled" v-if="showFirstPage">
         <a class="page-link" href="#">...</a>
       </li>
 
-      <li v-for="page in pages" :key="page.name" class="page-item">
+      <li v-for="page in pages" :key="page.name" class="page-item shadow">
         <a
           class="page-link"
           :class="{ active: page.isActive }"
@@ -25,11 +25,11 @@
       <li class="page-item disabled" v-if="showLastPage">
         <a class="page-link" href="#">...</a>
       </li>
-      <li class="page-item" v-if="showLastPage">
+      <li class="page-item shadow" v-if="showLastPage">
         <a class="page-link" href="#" @click="pageClick(totalPages)">{{ totalPages }}</a>
       </li>
 
-      <li v-if="hasNext" class="page-item">
+      <li v-if="hasNext" class="page-item shadow">
         <a class="page-link" href="#" @click="nextPage"> Next </a>
       </li>
     </ul>

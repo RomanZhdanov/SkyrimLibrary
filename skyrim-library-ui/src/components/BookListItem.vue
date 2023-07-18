@@ -8,7 +8,7 @@
       </p>
     </div>
   </div> -->
-  <div class="card mb-3">
+  <div class="card mb-3 shadow">
     <div class="card-body">
       <div class="d-flex">
         <div class="flex-shrink-0">

@@ -2,7 +2,7 @@
   <div class="mb-4">
     <input
       v-model="searchInput"
-      class="form-control form-control-lg"
+      class="form-control form-control-lg shadow-sm"
       type="text"
       placeholder="search book by title"
     />

@@ -11,7 +11,7 @@
             <small class="text-body-secondary">by {{ author }}</small>
           </p>
           <p class="card-text">{{ description }}</p>
-          <router-link class="btn btn-primary" :to="readLink">Read</router-link>
+          <router-link class="btn btn-primary shadow-sm" :to="readLink">Read</router-link>
         </div>
       </div>
     </div>

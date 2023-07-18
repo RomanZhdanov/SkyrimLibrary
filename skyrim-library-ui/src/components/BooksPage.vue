@@ -31,7 +31,7 @@ import { defineComponent } from 'vue'
 import { useBooksPageStore } from '@/stores/booksPage'
 import type { BookPageResult } from '@/types/bookTypes'
 import BookListItem from './BookListItem.vue'
-import BasePagination from '@/components/BasePagination.vue'
+import BasePagination from '@/components/ui/BasePagination.vue'
 
 export default defineComponent({
   components: {
