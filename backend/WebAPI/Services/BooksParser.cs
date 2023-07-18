@@ -5,10 +5,12 @@ namespace SkyrimLibrary.WebAPI.Services;
 internal class BooksParser
 {
     private readonly HttpClient _httpClient;
+    private readonly IWebHostEnvironment _hostEnvironment;
 
-    public BooksParser(HttpClient httpClient)
+    public BooksParser(HttpClient httpClient, IWebHostEnvironment hostEnvironment)
     {
         _httpClient = httpClient;
+        _hostEnvironment = hostEnvironment;
     }
 
     public async Task<string> GetBookTextAsync(string bookUrl)
@@ -46,7 +48,7 @@ internal class BooksParser
 
     private async Task DownloadImageAsync(string imageUrl, string fileName)
     {
-        var folder = "wwwroot/img/covers";
+        var folder = Path.Combine(_hostEnvironment.WebRootPath, "img/covers");
 
         if (!Directory.Exists(folder))
             Directory.CreateDirectory(folder);

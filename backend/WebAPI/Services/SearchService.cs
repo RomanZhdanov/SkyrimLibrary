@@ -40,13 +40,13 @@ namespace SkyrimLibrary.WebAPI.Services
             return response.Items;
         }        
 
-        public async Task AddManyBooksAsync(ICollection<BookSearchItem> books)
+        public async Task AddOrUpdateManyBooksAsync(ICollection<BookSearchItem> books)
         {
             foreach (var book in books)
             {
                 ProcessBookItem(book);
 
-                await _rx.InsertDocumentsToNamespaceAsync("books", new List<BookSearchItem> { book });
+                await _rx.UpsertDocumentsInNamespaceAsync("books", new List<BookSearchItem> { book });
             }
         }
 

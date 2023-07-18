@@ -9,9 +9,9 @@ public class BooksDb
 {
     private readonly List<Book> books;
 
-    public BooksDb()
+    public BooksDb(IWebHostEnvironment hostEnvironment)
     {
-        string fileName = "wwwroot/data/SkyrimBooks.json";
+        string fileName = Path.Combine(hostEnvironment.WebRootPath, "data/SkyrimBooks.json");
         string jsonString = File.ReadAllText(fileName);
         books = JsonSerializer.Deserialize<List<Book>>(jsonString)!;
 

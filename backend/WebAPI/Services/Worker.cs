@@ -10,13 +10,16 @@ internal class Worker
     private readonly ILogger<Worker> _logger;
     private readonly BooksParser _booksParser;
     private readonly SearchService _searchService;
-    private readonly string _jsonPath = "wwwroot/data/SkyrimBooks.json";
+    private readonly IWebHostEnvironment _hostingEnvironment;
+    private readonly string _jsonPath = "data/SkyrimBooks.json";
 
-    public Worker(ILogger<Worker> logger, BooksParser booksParser, SearchService searchService)
+    public Worker(ILogger<Worker> logger, IWebHostEnvironment hostingEnvironment, BooksParser booksParser, SearchService searchService)
     {
         _logger = logger;
         _booksParser = booksParser;
         _searchService = searchService;
+        _hostingEnvironment = hostingEnvironment;
+        _jsonPath = Path.Combine(_hostingEnvironment.WebRootPath, _jsonPath);
     }
 
     public async Task Run()
@@ -84,7 +87,7 @@ internal class Worker
     {
         try
         {
-            var booksDb = new BooksDb();
+            var booksDb = new BooksDb(_hostingEnvironment);
             var result = await _searchService.Initialize();
 
             if (!result.Succeeded)
@@ -103,7 +106,7 @@ internal class Worker
                 CoverImage = b.CoverImage
             }).ToList();
 
-            await _searchService.AddManyBooksAsync(books);
+            await _searchService.AddOrUpdateManyBooksAsync(books);
         }
         catch (Exception ex)
         {
@@ -115,20 +118,26 @@ internal class Worker
 
     private void ResizeCovers()
     {
-        var outPath = "wwwroot/img/covers/thumb";
+        var inPath = Path.Combine(_hostingEnvironment.WebRootPath, "img/covers");
+        var outPath = Path.Combine(_hostingEnvironment.WebRootPath, "img/covers/thumb");
 
         if (!Directory.Exists(outPath))
             Directory.CreateDirectory(outPath);
 
-        var images = Directory.GetFiles("wwwroot/img/covers");
+        var images = Directory.GetFiles(inPath);
 
         foreach (var filePath in images)
         {
-            using (Image image = Image.Load(filePath))
+            var savePath = Path.Combine(outPath, Path.GetFileName(filePath));
+
+            if (!File.Exists(savePath))
             {
-                image.Mutate(x => x.Resize(60, 60));
-                var savePath = Path.Combine(outPath, Path.GetFileName(filePath));
-                image.Save(savePath, new PngEncoder());
+                using (Image image = Image.Load(filePath))
+                {
+                    image.Mutate(x => x.Resize(60, 60));
+
+                    image.Save(savePath, new PngEncoder());
+                }
             }
         }
     }
