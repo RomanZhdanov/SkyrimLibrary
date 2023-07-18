@@ -20,6 +20,9 @@ internal class Worker
         _searchService = searchService;
         _hostingEnvironment = hostingEnvironment;
         _jsonPath = Path.Combine(_hostingEnvironment.WebRootPath, _jsonPath);
+
+        if (!Directory.Exists(Path.GetDirectoryName(_jsonPath)))
+            Directory.CreateDirectory(Path.GetDirectoryName(_jsonPath));
     }
 
     public async Task Run()
@@ -35,14 +38,15 @@ internal class Worker
     {
         _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
         var books = new List<Book>(536);
-
         var html = await _booksParser.GetHtmlPageAsync("/wiki/Skyrim:Books");
         var doc = new HtmlDocument();
-        doc.LoadHtml(html);
+        doc.LoadHtml(html);        
 
         var tables = doc.DocumentNode.SelectNodes("//table");
         var booksTable = tables[1];
         var bookRows = booksTable.SelectNodes(".//tr").ToArray();
+        var coverSavePath = Path.Combine(_hostingEnvironment.WebRootPath, "img/covers");
+        var picturesPath = Path.Combine(_hostingEnvironment.WebRootPath, "img/pictures");
 
         for (int i = 1; i < bookRows.Length; i++)
         {
@@ -50,11 +54,11 @@ internal class Worker
             {
                 var imageLink = bookRows[i].SelectSingleNode(".//td[1]//a[1]");
                 var imageUrl = imageLink.GetAttributeValue("href", "");
-                var coverImage = await _booksParser.GetBookCoverImageAsync(imageUrl);
+                var coverImage = await _booksParser.GetBookCoverImageAsync(imageUrl, coverSavePath);
                 var bookLink = bookRows[i].SelectSingleNode(".//td[2]//a[1]");
                 var bookUrl = bookLink.GetAttributeValue("href", "");
                 var title = bookLink?.InnerText;
-                var text = await _booksParser.GetBookTextAsync(bookUrl);
+                var text = await _booksParser.GetBookTextAsync(bookUrl, picturesPath);
                 var id = bookRows[i].SelectSingleNode(".//span[@class='idall']").InnerText;
                 var author = bookRows[i].SelectSingleNode(".//td[4]")?.InnerText;
                 var description = bookRows[i].SelectSingleNode(".//td[5]")?.InnerText;

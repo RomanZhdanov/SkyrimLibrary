@@ -16,10 +16,10 @@ public class BooksDb
         string jsonString = File.ReadAllText(fileName);
         books = JsonSerializer.Deserialize<List<Book>>(jsonString)!;
 
-        foreach (var book in books)
-        {
-            book.Text = book.Text.RemoveLinks();
-        }
+        //foreach (var book in books)
+        //{
+        //    book.Text = book.Text.RemoveLinks();
+        //}
     }
 
     public IEnumerable<Book> GetAll()

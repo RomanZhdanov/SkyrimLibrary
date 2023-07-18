@@ -5,26 +5,52 @@ namespace SkyrimLibrary.WebAPI.Services;
 internal class BooksParser
 {
     private readonly HttpClient _httpClient;
-    private readonly IWebHostEnvironment _hostEnvironment;
 
-    public BooksParser(HttpClient httpClient, IWebHostEnvironment hostEnvironment)
+    public BooksParser(HttpClient httpClient)
     {
         _httpClient = httpClient;
-        _hostEnvironment = hostEnvironment;
     }
 
-    public async Task<string> GetBookTextAsync(string bookUrl)
+    public async Task<string?> GetBookTextAsync(string bookUrl, string picturesPath)
     {
         var bookHtml = await GetHtmlPageAsync(bookUrl);
         var doc = new HtmlDocument();
         doc.LoadHtml(bookHtml);
 
-        var book = doc.DocumentNode.SelectSingleNode("//div[@class='book']")?.InnerHtml;
+        string[] bookClasses = { "book", "poem" , "floatnone" };
 
-        return book;
+        HtmlNode? book = null;
+
+        foreach (var bookClass in bookClasses )
+        {
+            book = doc.DocumentNode.SelectSingleNode($"//div[@class='{bookClass}']");
+
+            if (book is not null) break;
+        }
+
+        if (book is null )
+            return null;
+
+        var imageNodes = book.SelectNodes(".//img");
+
+        if (imageNodes != null)
+        {
+            foreach (HtmlNode iamgeNode in imageNodes)
+            {
+                string imgUrl = iamgeNode.GetAttributeValue("src", "");
+
+                if (!string.IsNullOrEmpty(imgUrl))
+                {
+                    var picture = await GetImageFromUrlAsync("https:" + imgUrl, picturesPath);
+                    iamgeNode.SetAttributeValue("src", picture);
+                }
+            }
+        }
+
+        return book.InnerHtml;
     }
 
-    public async Task<string> GetBookCoverImageAsync(string coverUrl)
+    public async Task<string> GetBookCoverImageAsync(string coverUrl, string savePath)
     {
         var coverHtml = await GetHtmlPageAsync(coverUrl);
         var doc = new HtmlDocument();
@@ -32,9 +58,14 @@ internal class BooksParser
 
         var imageUrl = doc.DocumentNode.SelectSingleNode("//div[@class='fullImageLink']//a").GetAttributeValue("href", "");
 
+        return await GetImageFromUrlAsync("https:" + imageUrl, savePath);        
+    }
+
+    public async Task<string> GetImageFromUrlAsync(string imageUrl, string savePath)
+    {
         var fileName = imageUrl.Split('/').Last();
 
-        await DownloadImageAsync("https:" + imageUrl, fileName);
+        await DownloadImageAsync(imageUrl, Path.Combine(savePath, fileName));
 
         return fileName;
     }
@@ -46,15 +77,15 @@ internal class BooksParser
         return await response.Content.ReadAsStringAsync();
     }
 
-    private async Task DownloadImageAsync(string imageUrl, string fileName)
+    private async Task DownloadImageAsync(string imageUrl, string savePath)
     {
-        var folder = Path.Combine(_hostEnvironment.WebRootPath, "img/covers");
-
-        if (!Directory.Exists(folder))
-            Directory.CreateDirectory(folder);
-
-        if (File.Exists($"{folder}/{fileName}"))
+        if (File.Exists(savePath))
             return;
+        
+        var dir = Path.GetDirectoryName(savePath);
+
+        if (!Directory.Exists(dir))
+            Directory.CreateDirectory(dir);
 
         using (HttpClient client = new HttpClient())
         {
@@ -63,7 +94,7 @@ internal class BooksParser
                 byte[] imageData = await client.GetByteArrayAsync(imageUrl);
 
                 // Save the image data to a file
-                await System.IO.File.WriteAllBytesAsync(folder + fileName, imageData);
+                await System.IO.File.WriteAllBytesAsync(savePath, imageData);
 
                 Console.WriteLine("Image downloaded successfully.");
             }

@@ -2,6 +2,7 @@ using ReindexerClient;
 using SkyrimLibrary.WebAPI.DTO;
 using SkyrimLibrary.WebAPI.Models;
 using SkyrimLibrary.WebAPI.Services;
+using SkyrimLibrary.WebAPI.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,11 +63,15 @@ app.MapGet("/books/", (int page, int pageSize, BooksDb booksDb, HttpContext cont
     return Results.Ok(new PaginatedList<BookDTO>(books, count, page, pageSize));
 });
 
-app.MapGet("/books/{id}", (string id, BooksDb booksDb) =>
+app.MapGet("/books/{id}", (string id, BooksDb booksDb, HttpContext context) =>
 {
+    var baseURL = context.Request.Host;
+    var scheme = context.Request.Scheme;
     var book = booksDb.GetBook(id);
     
     if (book is null) return Results.NotFound();
+
+    book.Text = book.Text.RemoveLinks($"{scheme}://{baseURL}/img/pictures/");
 
     return Results.Ok(book);
 });
