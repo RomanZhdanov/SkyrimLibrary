@@ -4,12 +4,10 @@ WORKDIR /app
     
 # Copy csproj and restore as distinct layers
 COPY *.sln .
-COPY ./BookFetcher/*csproj ./BookFetcher/
 COPY ./WebAPI/*csproj ./WebAPI/
 RUN dotnet restore
     
 # Copy everything else and build
-COPY ./BookFetcher/. ./BookFetcher/
 COPY ./WebAPI/. ./WebAPI/
 
 WORKDIR /app/WebAPI
