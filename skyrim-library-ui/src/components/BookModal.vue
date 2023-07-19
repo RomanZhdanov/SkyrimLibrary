@@ -42,7 +42,7 @@ export default defineComponent({
     async loadBook() {
       this.isLoading = true
       try {
-        const { data } = await api.get(this.localBookId)
+        const { data } = await api.getDetails(this.localBookId)
         this.book = data
       } catch (err: unknown) {
         const error = err as AxiosError

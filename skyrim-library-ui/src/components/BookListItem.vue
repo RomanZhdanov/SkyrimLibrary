@@ -39,7 +39,7 @@ export default defineComponent({
     },
     snippets: {
       type: String,
-      required: true
+      required: false
     },
     description: {
       type: String,
