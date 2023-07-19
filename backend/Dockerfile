@@ -5,9 +5,11 @@ WORKDIR /app
 # Copy csproj and restore as distinct layers
 COPY *.sln .
 COPY ./WebAPI/*csproj ./WebAPI/
+COPY ./lib/ReindexerSharp/ReindexerSharp/*csproj ./lib/ReindexerSharp/ReindexerSharp/
 RUN dotnet restore
     
 # Copy everything else and build
+COPY ./lib/. ./lib/
 COPY ./WebAPI/. ./WebAPI/
 
 WORKDIR /app/WebAPI
