@@ -11,7 +11,7 @@ internal class Worker
     private readonly BooksParser _booksParser;
     private readonly SearchService _searchService;
     private readonly IWebHostEnvironment _hostingEnvironment;
-    private readonly string _jsonPath = "data/SkyrimBooks.json";
+    private readonly string _jsonBooksPath = "data/SkyrimBooks.json";
 
     public Worker(ILogger<Worker> logger, IWebHostEnvironment hostingEnvironment, BooksParser booksParser, SearchService searchService)
     {
@@ -19,15 +19,15 @@ internal class Worker
         _booksParser = booksParser;
         _searchService = searchService;
         _hostingEnvironment = hostingEnvironment;
-        _jsonPath = Path.Combine(_hostingEnvironment.WebRootPath, _jsonPath);
+        _jsonBooksPath = Path.Combine(_hostingEnvironment.WebRootPath, _jsonBooksPath);
 
-        if (!Directory.Exists(Path.GetDirectoryName(_jsonPath)))
-            Directory.CreateDirectory(Path.GetDirectoryName(_jsonPath));
+        if (!Directory.Exists(Path.GetDirectoryName(_jsonBooksPath)))
+            Directory.CreateDirectory(Path.GetDirectoryName(_jsonBooksPath));
     }
 
     public async Task Run()
     {
-        if (!File.Exists(_jsonPath))
+        if (!File.Exists(_jsonBooksPath))
             await ParseBooksData();
 
         await InitSearchEngine();
@@ -58,7 +58,13 @@ internal class Worker
                 var bookLink = bookRows[i].SelectSingleNode(".//td[2]//a[1]");
                 var bookUrl = bookLink.GetAttributeValue("href", "");
                 var title = bookLink?.InnerText;
-                var text = await _booksParser.GetBookTextAsync(bookUrl, picturesPath);
+
+                var bookPageHtml = await _booksParser.GetHtmlPageAsync(bookUrl);
+                var bookDocoument = new HtmlDocument();
+                bookDocoument.LoadHtml(bookPageHtml);
+
+                var text = await _booksParser.GetBookTextAsync(bookDocoument, picturesPath);
+                var bookSeries = _booksParser.GetBookSeries(bookDocoument);
                 var id = bookRows[i].SelectSingleNode(".//span[@class='idall']").InnerText;
                 var author = bookRows[i].SelectSingleNode(".//td[4]")?.InnerText;
                 var description = bookRows[i].SelectSingleNode(".//td[5]")?.InnerText;
@@ -84,7 +90,7 @@ internal class Worker
         }
 
         var json = JsonSerializer.Serialize(books);
-        File.WriteAllText(_jsonPath, json);
+        File.WriteAllText(_jsonBooksPath, json);
     }
 
     private async Task InitSearchEngine()

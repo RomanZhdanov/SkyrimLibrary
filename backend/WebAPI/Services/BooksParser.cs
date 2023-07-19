@@ -11,19 +11,15 @@ internal class BooksParser
         _httpClient = httpClient;
     }
 
-    public async Task<string?> GetBookTextAsync(string bookUrl, string picturesPath)
-    {
-        var bookHtml = await GetHtmlPageAsync(bookUrl);
-        var doc = new HtmlDocument();
-        doc.LoadHtml(bookHtml);
-
+    public async Task<string?> GetBookTextAsync(HtmlDocument bookDocument, string picturesPath)
+    {   
         string[] bookClasses = { "book", "poem" , "floatnone" };
 
         HtmlNode? book = null;
 
         foreach (var bookClass in bookClasses )
         {
-            book = doc.DocumentNode.SelectSingleNode($"//div[@class='{bookClass}']");
+            book = bookDocument.DocumentNode.SelectSingleNode($"//div[@class='{bookClass}']");
 
             if (book is not null) break;
         }
@@ -31,6 +27,53 @@ internal class BooksParser
         if (book is null )
             return null;
 
+        await LoadBookPicturesAsync(book, picturesPath);
+
+        return book.InnerHtml;
+    }
+
+    public string? GetBookSeries(HtmlDocument bookDocument)
+    {
+        var infobox = bookDocument.DocumentNode.SelectSingleNode("//table[@class='wikitable infobox']");
+
+        if (infobox is null) return null;
+
+        var seriesRow = FindSeriesRow(infobox);
+
+        if (seriesRow is null) return null;
+
+        var seriesName = seriesRow.SelectNodes(".//td")?[0].InnerText;
+
+        return seriesName;
+    }
+
+    private HtmlNode FindSeriesRow(HtmlNode table)
+    {
+        HtmlNodeCollection rows = table.SelectNodes(".//tr");
+
+        if (rows != null)
+        {
+            foreach (HtmlNode row in rows)
+            {
+                HtmlNodeCollection cells = row.SelectNodes(".//th");
+                if (cells != null)
+                {
+                    foreach (HtmlNode cell in cells)
+                    {
+                        if (cell.InnerText.Trim() == "Up")
+                        {
+                            return row; // Found the row with the unique text
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private async Task LoadBookPicturesAsync(HtmlNode book, string picturesPath)
+    {
         var imageNodes = book.SelectNodes(".//img");
 
         if (imageNodes != null)
@@ -46,9 +89,8 @@ internal class BooksParser
                 }
             }
         }
-
-        return book.InnerHtml;
     }
+
 
     public async Task<string> GetBookCoverImageAsync(string coverUrl, string savePath)
     {
