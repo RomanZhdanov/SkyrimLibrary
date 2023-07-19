@@ -2,7 +2,7 @@ using HtmlAgilityPack;
 
 namespace SkyrimLibrary.WebAPI.Services;
 
-internal class BooksParser
+public class BooksParser
 {
     private readonly HttpClient _httpClient;
 

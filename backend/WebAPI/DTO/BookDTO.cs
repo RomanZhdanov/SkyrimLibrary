@@ -1,4 +1,6 @@
-﻿namespace SkyrimLibrary.WebAPI.DTO
+﻿using SkyrimLibrary.WebAPI.Models;
+
+namespace SkyrimLibrary.WebAPI.DTO
 {
     public class BookDTO
     {
@@ -15,5 +17,7 @@
         public string Snippets { get; set; }
 
         public string CoverImage { get; set; }
+
+        public SeriesDTO? Series { get; set; }
     }
 }

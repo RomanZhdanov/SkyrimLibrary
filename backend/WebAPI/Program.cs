@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using ReindexerClient;
+using SkyrimLibrary.WebAPI.Data;
 using SkyrimLibrary.WebAPI.DTO;
 using SkyrimLibrary.WebAPI.Models;
 using SkyrimLibrary.WebAPI.Services;
@@ -7,7 +9,11 @@ using SkyrimLibrary.WebAPI.Utils;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddSingleton<BooksDb>();
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"),
+        builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
+
+builder.Services.AddScoped<ApplicationDbContextInitialiser>();
 builder.Services.AddReindexer();
 builder.Services.AddTransient<SearchService>();
 builder.Services.AddTransient<Worker>();
@@ -47,13 +53,27 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-app.MapGet("/books/", (int page, int pageSize, BooksDb booksDb, HttpContext context) =>
+app.MapGet("/books/", (int page, int pageSize, ApplicationDbContext dbContext, HttpContext context) =>
 {
     var baseURL = context.Request.Host;
     var scheme = context.Request.Scheme;
 
-    var count = booksDb.Count();
-    var books = booksDb.GetPage(page, pageSize);
+    var count = dbContext.Books.AsNoTracking().Count();
+    int startIndex = (page - 1) * pageSize;
+    var books = dbContext.Books
+            .AsNoTracking()
+            .OrderBy(b => b.Title)
+            .Skip(startIndex)
+            .Take(pageSize)
+            .Select(b => new BookDTO
+            {
+                Id = b.Id,
+                Title = b.Title,
+                Description = b.Description,
+                Author = b.Author,
+                Type = b.Type,
+                CoverImage = b.CoverImage,
+            }).ToList();
 
     foreach (var book in books)
     {
@@ -63,11 +83,13 @@ app.MapGet("/books/", (int page, int pageSize, BooksDb booksDb, HttpContext cont
     return Results.Ok(new PaginatedList<BookDTO>(books, count, page, pageSize));
 });
 
-app.MapGet("/books/{id}", (string id, BooksDb booksDb, HttpContext context) =>
+app.MapGet("/books/{id}", (string id, ApplicationDbContext dbContext, HttpContext context) =>
 {
     var baseURL = context.Request.Host;
     var scheme = context.Request.Scheme;
-    var book = booksDb.GetBook(id);
+    var book = dbContext.Books
+        .AsNoTracking()
+        .SingleOrDefault(b => b.Id == id);
     
     if (book is null) return Results.NotFound();
 
@@ -76,11 +98,36 @@ app.MapGet("/books/{id}", (string id, BooksDb booksDb, HttpContext context) =>
     return Results.Ok(book);
 });
 
-app.MapGet("/books/{id}/details", (string id, HttpContext context, BooksDb booksDb) =>
+app.MapGet("/books/{id}/details", (string id, HttpContext context, ApplicationDbContext dbContext) =>
 {
     var baseURL = context.Request.Host;
     var scheme = context.Request.Scheme;
-    var book = booksDb.GetBook(id);
+    var book = dbContext.Books
+        .AsNoTracking()
+        .Include(b => b.Series)
+        .SingleOrDefault(b => b.Id == id);
+
+    SeriesDTO series = null;
+
+    if (book.Series is not null)
+    {
+        var books = dbContext.Books
+            .AsNoTracking()
+            .Where(b => b.SeriesId == book.SeriesId)
+            .Select(b => new BookSeriesDTO
+            {
+                Id = b.Id,
+                Title = b.Title,
+                Current = b.Id == book.Id
+            }).ToList();
+
+        series = new SeriesDTO
+        {
+            Id = book.Series.Id,
+            Name = book.Series.Name,
+            Books = books
+        };
+    }
 
     if (book is null) return Results.NotFound();
 
@@ -90,7 +137,8 @@ app.MapGet("/books/{id}/details", (string id, HttpContext context, BooksDb books
         Title = book.Title,
         Author = book.Author,
         Description = book.Description,
-        CoverImage = $"{scheme}://{baseURL}/img/covers/{book.CoverImage}"
+        CoverImage = $"{scheme}://{baseURL}/img/covers/{book.CoverImage}",
+        Series = series
     });
 });
 
