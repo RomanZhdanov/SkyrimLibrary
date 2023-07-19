@@ -1,0 +1,3 @@
+[submodule "backend/lib/ReindexerSharp"]
+	path = backend/lib/ReindexerSharp
+	url = https://github.com/RomanZhdanov/ReindexerSharp
