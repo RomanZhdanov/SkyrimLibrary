@@ -6,6 +6,7 @@
       :author="book.author"
       :description="book.description"
       :cover-src="book.coverImage"
+      :series="book.series"
     />
   </div>
   <div v-else="error">{{ error }}</div>
@@ -48,6 +49,11 @@ export default defineComponent({
           this.error = 'Something went wrong...'
         }
       }
+    }
+  },
+  watch: {
+    id: function (newVal) {
+      this.loadBook()
     }
   },
   created() {

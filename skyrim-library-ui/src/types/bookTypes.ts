@@ -36,4 +36,17 @@ export interface BookDetails {
   author: string
   type: string
   coverImage: string
+  series: Series
+}
+
+export interface Series {
+  id: number
+  name: string
+  books: BookSeries[]
+}
+
+export interface BookSeries {
+  id: string
+  title: string
+  current: boolean
 }

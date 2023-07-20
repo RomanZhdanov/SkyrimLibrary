@@ -11,7 +11,30 @@
             <small class="text-body-secondary">by {{ author }}</small>
           </p>
           <p class="card-text">{{ description }}</p>
-          <router-link class="btn btn-primary shadow-sm" :to="readLink">Read</router-link>
+          <div v-if="series">
+            <small
+              >Part of the series <strong>{{ series.name }}</strong
+              >:</small
+            >
+            <ul>
+              <li v-for="book in series.books" :key="book.id">
+                <span v-if="book.current">{{ book.title }}</span>
+                <router-link v-else :to="'/books/' + book.id">{{ book.title }}</router-link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <router-link class="btn btn-primary shadow-sm" :to="readLink" role="button"
+              >Read book</router-link
+            >
+            <router-link
+              class="btn btn-primary ms-2 shadow-sm"
+              :to="readLink"
+              v-if="series"
+              role="button"
+              >Read series</router-link
+            >
+          </div>
         </div>
       </div>
     </div>
@@ -19,7 +42,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, type PropType } from 'vue'
+import type { Series } from '@/types/bookTypes'
 
 export default defineComponent({
   props: {
@@ -27,7 +51,8 @@ export default defineComponent({
     coverSrc: String,
     title: String,
     description: String,
-    author: String
+    author: String,
+    series: Object as PropType<Series>
   },
   computed: {
     readLink() {
