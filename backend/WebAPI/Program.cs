@@ -4,6 +4,7 @@ using SkyrimLibrary.WebAPI.Queries.GetBook;
 using SkyrimLibrary.WebAPI.Queries.GetBookDetails;
 using SkyrimLibrary.WebAPI.Queries.GetBooksPage;
 using SkyrimLibrary.WebAPI.Queries.GetBooksSearch;
+using SkyrimLibrary.WebAPI.Queries.GetSeries;
 using SkyrimLibrary.WebAPI.Queries.GetSeriesDetails;
 using SkyrimLibrary.WebAPI.Services;
 
@@ -56,6 +57,18 @@ app.MapGet("/series/{id}", async (int id, QueryDispatcher queryDispatcher) =>
     );
 
     if (series is null) return Results.NotFound($"Series with id '{id}' was not found.");
+
+    return Results.Ok(series);
+});
+
+app.MapGet("/series/", async (QueryDispatcher queryDispatcher) =>
+{
+    var series = await queryDispatcher
+        .DispatchAsync<GetSeriesQuery, IList<SkyrimLibrary.WebAPI.Queries.GetSeries.SeriesDTO>>(
+    new GetSeriesQuery()
+    );
+
+    if (series is null) return Results.NotFound($"Series was not found.");
 
     return Results.Ok(series);
 });
