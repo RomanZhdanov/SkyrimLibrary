@@ -16,10 +16,13 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <router-link class="nav-link active" aria-current="page" to="/">Home</router-link>
+            <router-link class="nav-link" to="/books">Books</router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" to="/books">Books</router-link>
+            <router-link class="nav-link" to="/series">Series</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-link" to="/authors">Authors</router-link>
           </li>
         </ul>
       </div>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import BookSearch from '../components/BookSearch.vue'
+import BookSearch from '../components/books/BookSearch.vue'
 </script>
 
 <template>

@@ -16,7 +16,7 @@
 <script lang="ts">
 import * as api from '@/api'
 import { defineComponent } from 'vue'
-import BookCard from '@/components/BookCard.vue'
+import BookCard from '@/components/books/BookCard.vue'
 import type { BookDetails } from '@/types/bookTypes'
 import type { AxiosError } from 'axios'
 

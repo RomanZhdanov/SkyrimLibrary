@@ -8,8 +8,8 @@
 import * as api from '@/api'
 import type { AxiosError } from 'axios'
 import { defineComponent } from 'vue'
-import type { SeriesDetails } from '@/types/bookTypes'
-import SeriesCard from '@/components/SeriesCard.vue'
+import type { SeriesDetails } from '@/types/seriesTypes'
+import SeriesCard from '@/components/series/SeriesCard.vue'
 
 export default defineComponent({
   props: {

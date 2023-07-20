@@ -4,7 +4,7 @@
       v-model="searchInput"
       class="form-control form-control-lg shadow-sm"
       type="text"
-      placeholder="search book by title"
+      placeholder="start typing here to search..."
     />
   </div>
   <div v-if="message">{{ message }}</div>
@@ -30,7 +30,7 @@
 import { defineComponent } from 'vue'
 import { useBookSearchStore } from '@/stores/bookSearch'
 import type { BookItem, BookSearchResult } from '@/types/bookTypes'
-import BookListItem from '@/components/BookListItem.vue'
+import BookListItem from '@/components/books/BookListItem.vue'
 
 export default defineComponent({
   components: {

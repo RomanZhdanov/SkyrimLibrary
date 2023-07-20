@@ -37,7 +37,7 @@ namespace SkyrimLibrary.WebAPI.Queries.GetBook
             {
                 Id = book.Id,
                 Title = book.Title,
-                Author = book.Title,
+                Author = book.Author,
                 Text = book.Text?.RemoveLinks($"{scheme}://{baseURL}/img/pictures/")
             };
         }

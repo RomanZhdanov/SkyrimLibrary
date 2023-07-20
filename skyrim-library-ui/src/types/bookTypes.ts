@@ -50,15 +50,3 @@ export interface BookSeries {
   title: string
   current: boolean
 }
-
-export interface SeriesDetails {
-  id: number
-  name: string
-  books: BookSeriesItem[]
-}
-
-export interface BookSeriesItem {
-  id: string
-  title: string
-  coverImage: string
-}

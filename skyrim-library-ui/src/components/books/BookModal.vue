@@ -17,7 +17,7 @@ import { defineComponent } from 'vue'
 import * as api from '@/api'
 import type { AxiosError } from 'axios'
 import BaseModal from '@/components/ui/BaseModal.vue'
-import BookCard from '@/components/BookCard.vue'
+import BookCard from '@/components/books/BookCard.vue'
 import type { BookDetails } from '@/types/bookTypes'
 
 export default defineComponent({
