@@ -1,8 +1,9 @@
 ﻿using ReindexerClient;
 using ReindexerClient.Helpers;
-using SkyrimLibrary.WebAPI.Attributes;
+using SkyrimLibrary.WebAPI.Common.Attributes;
+using SkyrimLibrary.WebAPI.Common.Extensions;
+using SkyrimLibrary.WebAPI.Common.Models;
 using SkyrimLibrary.WebAPI.Models;
-using SkyrimLibrary.WebAPI.Utils;
 
 namespace SkyrimLibrary.WebAPI.Services
 {

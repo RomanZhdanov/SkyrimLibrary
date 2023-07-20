@@ -1,5 +1,5 @@
 ﻿using ReindexerClient.Attributes;
-using SkyrimLibrary.WebAPI.Attributes;
+using SkyrimLibrary.WebAPI.Common.Attributes;
 
 namespace SkyrimLibrary.WebAPI.Models
 {

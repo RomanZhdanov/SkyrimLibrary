@@ -1,4 +1,4 @@
-﻿namespace SkyrimLibrary.WebAPI.DTO
+﻿namespace SkyrimLibrary.WebAPI.Queries.GetBookDetails
 {
     public class BookSeriesDTO
     {

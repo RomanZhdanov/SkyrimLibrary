@@ -1,4 +1,4 @@
-﻿namespace SkyrimLibrary.WebAPI.Models
+﻿namespace SkyrimLibrary.WebAPI.Common.Models
 {
     public class Result
     {

@@ -1,8 +1,8 @@
 ﻿using HtmlAgilityPack;
 
-namespace SkyrimLibrary.WebAPI.Utils
+namespace SkyrimLibrary.WebAPI.Common.Extensions
 {
-    public static class HtmlUtils
+    public static class StringExtensions
     {
         public static string ToStripHtml(this string text)
         {
