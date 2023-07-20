@@ -61,3 +61,9 @@ export default defineComponent({
   }
 })
 </script>
+
+<style scoped>
+.img-fluid {
+  width: 100%;
+}
+</style>
