@@ -1,10 +1,10 @@
 using SkyrimLibrary.WebAPI;
 using SkyrimLibrary.WebAPI.Common.Models;
-using SkyrimLibrary.WebAPI.Data;
 using SkyrimLibrary.WebAPI.Queries.GetBook;
 using SkyrimLibrary.WebAPI.Queries.GetBookDetails;
 using SkyrimLibrary.WebAPI.Queries.GetBooksPage;
 using SkyrimLibrary.WebAPI.Queries.GetBooksSearch;
+using SkyrimLibrary.WebAPI.Queries.GetSeriesDetails;
 using SkyrimLibrary.WebAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -48,20 +48,16 @@ app.MapGet("/books/{id}", async (string id, QueryDispatcher queryDispatcher) =>
     return Results.Ok(book);
 });
 
-app.MapGet("/series/{id}", (int id, ApplicationDbContext dbContext, HttpContext context) =>
+app.MapGet("/series/{id}", async (int id, QueryDispatcher queryDispatcher) =>
 {
-    //var baseURL = context.Request.Host;
-    //var scheme = context.Request.Scheme;
-    //var series = dbContext.Series
-    //    .AsNoTracking()
-    //    .Include(s => s.Books)
-    //    .SingleOrDefault(b => b.Id == id);
+    var series = await queryDispatcher
+        .DispatchAsync<GetSeriesDetailsQuery, SkyrimLibrary.WebAPI.Queries.GetSeriesDetails.SeriesDTO>(
+    new GetSeriesDetailsQuery(id)
+    );
 
-    //if (series is null) return Results.NotFound();
+    if (series is null) return Results.NotFound($"Series with id '{id}' was not found.");
 
-    //book.Text = book.Text.RemoveLinks($"{scheme}://{baseURL}/img/pictures/");
-
-    //return Results.Ok(book);
+    return Results.Ok(series);
 });
 
 app.MapGet("/books/{id}/details", async (string id, QueryDispatcher queryDispatcher) =>

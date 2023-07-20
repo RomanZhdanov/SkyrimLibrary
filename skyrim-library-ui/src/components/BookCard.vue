@@ -13,7 +13,9 @@
           <p class="card-text">{{ description }}</p>
           <div v-if="series">
             <small
-              >Part of the series <strong>{{ series.name }}</strong
+              >Part of the series
+              <router-link :to="'/series/' + series.id"
+                ><strong>{{ series.name }}</strong></router-link
               >:</small
             >
             <ul>

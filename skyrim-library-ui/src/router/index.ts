@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import BooksView from '@/views/BooksView.vue'
+import SeriesDetails from '@/views/SeriesDetials.vue'
 import BookDetails from '@/views/BookDetails.vue'
 import BookRead from '@/views/BookRead.vue'
 
@@ -19,6 +20,11 @@ const router = createRouter({
     {
       path: '/books/:id',
       component: BookDetails,
+      props: true
+    },
+    {
+      path: '/series/:id',
+      component: SeriesDetails,
       props: true
     },
     {
