@@ -1,4 +1,5 @@
 <template>
+  <h1 class="display-6">All books</h1>
   <BooksPage />
 </template>
 

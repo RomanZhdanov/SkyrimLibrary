@@ -1,5 +1,5 @@
 <template>
-  <h1 class="display-6">Books Series</h1>
+  <h1 class="display-6">Books series</h1>
   <div v-if="isLoading">Loading...</div>
   <div v-else class="list-group">
     <router-link
