@@ -15,11 +15,11 @@ namespace SkyrimLibrary.WebAPI
                 builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
             services.AddHttpContextAccessor();
-            services.AddScoped<ApplicationDbContextInitialiser>();
+            services.AddScoped<ApplicationDbContextInitializer>();
             services.AddReindexer();
             services.AddCQRS();
             services.AddTransient<SearchService>();
-            services.AddTransient<Worker>();
+            services.AddTransient<LibraryInitializer>();
             services.AddTransient<BooksParser>();
             services.AddHttpClient<BooksParser>(client =>
             {

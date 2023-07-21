@@ -5,27 +5,27 @@ using SkyrimLibrary.WebAPI.Models;
 
 namespace SkyrimLibrary.WebAPI.Services;
 
-internal class Worker
+internal class LibraryInitializer
 {
-    private readonly ILogger<Worker> _logger;
+    private readonly ILogger<LibraryInitializer> _logger;
     private readonly SearchService _searchService;
     private readonly IWebHostEnvironment _hostingEnvironment;
     private readonly ApplicationDbContext _context;
-    private readonly ApplicationDbContextInitialiser _applicationDbContextInitialiser;
+    private readonly ApplicationDbContextInitializer _applicationDbContextInitializer;
 
-    public Worker(ILogger<Worker> logger, SearchService searchService, IWebHostEnvironment hostingEnvironment, ApplicationDbContext context, ApplicationDbContextInitialiser applicationDbContextInitialiser)
+    public LibraryInitializer(ILogger<LibraryInitializer> logger, SearchService searchService, IWebHostEnvironment hostingEnvironment, ApplicationDbContext context, ApplicationDbContextInitializer applicationDbContextInitializer)
     {
         _logger = logger;
         _searchService = searchService;
         _hostingEnvironment = hostingEnvironment;
         _context = context;
-        _applicationDbContextInitialiser = applicationDbContextInitialiser;
+        _applicationDbContextInitializer = applicationDbContextInitializer;
     }
 
     public async Task Run()
     {
-        await _applicationDbContextInitialiser.InitialiseAsync();
-        await _applicationDbContextInitialiser.SeedAsync(_hostingEnvironment.WebRootPath);
+        await _applicationDbContextInitializer.InitialiseAsync();
+        await _applicationDbContextInitializer.SeedAsync(_hostingEnvironment.WebRootPath);
         await InitSearchEngine();
         ResizeCovers();
     }    

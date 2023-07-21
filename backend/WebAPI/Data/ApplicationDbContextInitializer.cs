@@ -5,13 +5,13 @@ using SkyrimLibrary.WebAPI.Services;
 
 namespace SkyrimLibrary.WebAPI.Data
 {
-    public class ApplicationDbContextInitialiser
+    public class ApplicationDbContextInitializer
     {
-        private readonly ILogger<ApplicationDbContextInitialiser> _logger;
+        private readonly ILogger<ApplicationDbContextInitializer> _logger;
         private readonly ApplicationDbContext _context;
         private readonly BooksParser _booksParser;
 
-        public ApplicationDbContextInitialiser(ILogger<ApplicationDbContextInitialiser> logger, ApplicationDbContext context, BooksParser booksParser)
+        public ApplicationDbContextInitializer(ILogger<ApplicationDbContextInitializer> logger, ApplicationDbContext context, BooksParser booksParser)
         {
             _logger = logger;
             _context = context;

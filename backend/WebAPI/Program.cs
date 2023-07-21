@@ -18,11 +18,11 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    var worker = services.GetRequiredService<Worker>();
+    var initializer = services.GetRequiredService<LibraryInitializer>();
 
     try
     {
-        await worker.Run();
+        await initializer.Run();
     }
     catch (Exception ex)
     {
