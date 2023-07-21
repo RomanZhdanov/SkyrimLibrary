@@ -32,19 +32,20 @@ public class BooksParser
         return book.InnerHtml;
     }
 
-    public string? GetBookSeries(HtmlDocument bookDocument)
+    public (string?, string?) GetBookSeries(HtmlDocument bookDocument)
     {
         var infobox = bookDocument.DocumentNode.SelectSingleNode("//table[@class='wikitable infobox']");
 
-        if (infobox is null) return null;
+        if (infobox is null) return (null, null);
 
         var seriesRow = FindSeriesRow(infobox);
 
-        if (seriesRow is null) return null;
+        if (seriesRow is null) return (null, null);
 
         var seriesName = seriesRow.SelectNodes(".//td")?[0].InnerText;
+        var seriesUrl = seriesRow.SelectSingleNode(".//a").GetAttributeValue("href", "");
 
-        return seriesName;
+        return (seriesName, seriesUrl);
     }
 
     private HtmlNode FindSeriesRow(HtmlNode table)

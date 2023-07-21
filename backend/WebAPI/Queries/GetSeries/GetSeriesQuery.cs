@@ -26,7 +26,7 @@ namespace SkyrimLibrary.WebAPI.Queries.GetSeries
                 .Select(s => new SeriesDTO
                 {
                     Id = s.Id,
-                    Name = s.Name,
+                    Name = s.FullName,
                     BooksCount = s.Books.Count
                 }).ToListAsync();
         }

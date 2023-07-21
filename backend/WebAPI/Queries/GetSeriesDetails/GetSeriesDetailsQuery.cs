@@ -33,8 +33,9 @@ namespace SkyrimLibrary.WebAPI.Queries.GetSeriesDetails
                 .Select(s => new SeriesDTO
                 {
                     Id = s.Id,
-                    Name = s.Name,
-                    Books = s.Books.Select(b => new BookSeriesDTO
+                    Name = s.FullName,
+                    Books = s.Books.OrderBy(b => b.SeriesOrder)
+                    .Select(b => new BookSeriesDTO
                     {
                         Id = b.Id,
                         Title = b.Title,

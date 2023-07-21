@@ -11,6 +11,12 @@
 
         public string Name { get; set; }
 
+        public string FullName { get; set; }
+
+        public string? Author { get; set; }
+
+        public string? Description { get; set; }
+
         public ICollection<Book> Books { get; set; }
     }
 }

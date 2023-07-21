@@ -19,4 +19,6 @@ public class Book
     public string CoverImage { get; set; }
 
     public Series? Series { get; set; }
+
+    public int? SeriesOrder { get; set; }
 }

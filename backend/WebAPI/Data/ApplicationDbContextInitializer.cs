@@ -10,6 +10,7 @@ namespace SkyrimLibrary.WebAPI.Data
         private readonly ILogger<ApplicationDbContextInitializer> _logger;
         private readonly ApplicationDbContext _context;
         private readonly BooksParser _booksParser;
+        private readonly Dictionary<int, string[]> _seriesBooksUrlDirctionary = new ();
 
         public ApplicationDbContextInitializer(ILogger<ApplicationDbContextInitializer> logger, ApplicationDbContext context, BooksParser booksParser)
         {
@@ -89,12 +90,19 @@ namespace SkyrimLibrary.WebAPI.Data
                     bookDocoument.LoadHtml(bookPageHtml);
 
                     var text = await _booksParser.GetBookTextAsync(bookDocoument, picturesPath);
-                    var bookSeries = _booksParser.GetBookSeries(bookDocoument);
+                    var (bookSeries, seriesUrl) = _booksParser.GetBookSeries(bookDocoument);
                     int? seriesId = null;
+                    int? seriesOrder = null;
                     
-                    if (bookSeries is not null)
+                    if (bookSeries is not null && seriesUrl is not null)
                     {
-                        seriesId = await GetSeriesIdAsync(bookSeries);
+                        seriesId = await GetSeriesIdAsync(bookSeries, seriesUrl);
+
+                        seriesOrder = _seriesBooksUrlDirctionary[seriesId.Value]
+                            .Select((url, i) => new { i, url })
+                            .Where((b => b.url == bookUrl))
+                            .Select(b => b.i + 1)
+                            .FirstOrDefault();
                     }
 
                     var id = bookRows[i].SelectSingleNode(".//span[@class='idall']").InnerText;
@@ -111,6 +119,7 @@ namespace SkyrimLibrary.WebAPI.Data
                         Description = description,
                         Type = type,
                         SeriesId = seriesId,
+                        SeriesOrder = seriesOrder,
                         CoverImage = coverImage
                     });
 
@@ -125,18 +134,73 @@ namespace SkyrimLibrary.WebAPI.Data
             return books;
         }
 
-        private async Task<int> GetSeriesIdAsync(string seriesName)
+        private async Task<int> GetSeriesIdAsync(string seriesName, string seriesUrl)
         {
-            var series = await _context.Series.SingleOrDefaultAsync(s => s.Name == seriesName);
+            var series = await _context.Series.SingleOrDefaultAsync(s => s.FullName == seriesName);
 
             if (series is null)
             {
-                series = new Series { Name = seriesName };
+                (series, var booksUrls) = await GetSeriesData(seriesUrl);
+                series.FullName = seriesName;
                 _context.Series.Add(series);
                 await _context.SaveChangesAsync();
+
+                _seriesBooksUrlDirctionary.Add(series.Id, booksUrls);
             }
 
             return series.Id;
+        }
+
+        private async Task<(Series, string[])> GetSeriesData(string seriesUrl)
+        {
+            var seriesHtml = await _booksParser.GetHtmlPageAsync(seriesUrl);
+
+            var seriesDoc = new HtmlDocument();
+            seriesDoc.LoadHtml(seriesHtml);
+
+            try
+            {
+                var books = seriesDoc.DocumentNode.SelectNodes("//span[@class='mw-headline']");
+                string[] booksUrl = new string[books.Count];
+
+                for (int i = 0; i < books.Count; i++)
+                {
+                    booksUrl[i] = books[i].SelectSingleNode(".//a")?.GetAttributeValue("href", "");
+                }
+
+                var titleBlocks = seriesDoc.DocumentNode
+                .SelectSingleNode("//div[@class='mw-parser-output']")
+                .SelectNodes(".//div")[0]
+                .SelectNodes("./div");
+
+                var title = titleBlocks[0].InnerText;
+                string? author = null;
+                string? description = null;
+
+                if (titleBlocks.Count == 3)
+                {
+                    author = titleBlocks[1].InnerText;
+                    description = titleBlocks[2].InnerText;
+                }
+                else
+                {
+                    description = titleBlocks[1].InnerText;
+                }
+
+                var series = new Series
+                {
+                    Name = title,
+                    Author = author,
+                    Description = description,
+                };
+
+                return (series, booksUrl);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error parsing series page: {message}", ex.Message);
+                throw;
+            }            
         }
     }
 }

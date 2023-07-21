@@ -39,6 +39,7 @@ namespace SkyrimLibrary.WebAPI.Queries.GetBookDetails
                 var books = _context.Books
                 .AsNoTracking()
                 .Where(b => b.SeriesId == book.SeriesId)
+                .OrderBy(b => b.SeriesOrder)
                 .Select(b => new BookSeriesDTO
                 {
                     Id = b.Id,
@@ -49,7 +50,7 @@ namespace SkyrimLibrary.WebAPI.Queries.GetBookDetails
                 series = new SeriesDTO
                 {
                     Id = book.Series.Id,
-                    Name = book.Series.Name,
+                    Name = book.Series.FullName,
                     Books = books
                 };
             }
