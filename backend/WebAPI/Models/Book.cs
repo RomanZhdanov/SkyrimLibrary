@@ -8,6 +8,8 @@ public class Book
 
     public string Title { get; set; }
 
+    public string? FullTitle { get; set; }
+
     public string? Text { get; set; }
 
     public string? Author { get; set; }
@@ -21,4 +23,6 @@ public class Book
     public Series? Series { get; set; }
 
     public int? SeriesOrder { get; set; }
+
+    public string? SeriesTitle { get; set; }
 }

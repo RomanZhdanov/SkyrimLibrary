@@ -5,6 +5,7 @@ import BookDetails from '@/views/books/BookDetails.vue'
 import BookRead from '@/views/books/BookRead.vue'
 import SeriesListView from '@/views/series/SeriesListView.vue'
 import SeriesDetailsView from '@/views/series/SeriesDetialsView.vue'
+import SeriesReadView from '@/views/series/SeriesReadView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -35,6 +36,11 @@ const router = createRouter({
     {
       path: '/series/:id',
       component: SeriesDetailsView,
+      props: true
+    },
+    {
+      path: '/series/:id/read',
+      component: SeriesReadView,
       props: true
     },
     {

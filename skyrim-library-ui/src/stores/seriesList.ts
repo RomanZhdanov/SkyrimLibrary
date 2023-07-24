@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
 import * as api from '@/api'
-import type { SeriesListItem } from '@/types/seriesTypes'
+import type { SeriesListItemType } from '@/types/seriesTypes'
 
 export const useSeriesListStore = defineStore('seriesList', {
   state: () => ({
-    seriesList: [] as SeriesListItem[]
+    seriesList: [] as SeriesListItemType[]
   }),
   actions: {
     async loadList() {

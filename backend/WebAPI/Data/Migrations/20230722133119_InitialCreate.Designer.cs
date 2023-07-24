@@ -11,7 +11,7 @@ using SkyrimLibrary.WebAPI.Data;
 namespace SkyrimLibrary.WebAPI.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230719130014_InitialCreate")]
+    [Migration("20230722133119_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -35,8 +35,17 @@ namespace SkyrimLibrary.WebAPI.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("FullTitle")
+                        .HasColumnType("TEXT");
+
                     b.Property<int?>("SeriesId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<int?>("SeriesOrder")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SeriesTitle")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Text")
                         .HasColumnType("TEXT");
@@ -60,6 +69,16 @@ namespace SkyrimLibrary.WebAPI.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Author")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()

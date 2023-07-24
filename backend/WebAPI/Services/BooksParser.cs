@@ -1,4 +1,5 @@
 using HtmlAgilityPack;
+using SkyrimLibrary.WebAPI.Common.Extensions;
 
 namespace SkyrimLibrary.WebAPI.Services;
 
@@ -9,6 +10,15 @@ public class BooksParser
     public BooksParser(HttpClient httpClient)
     {
         _httpClient = httpClient;
+    }
+
+    public string GetBookFullTitle(HtmlDocument bookDocument)
+    {
+        var titleBlocks = bookDocument.DocumentNode
+            .SelectSingleNode("//div[@class='mw-parser-output']/div")?
+            .SelectNodes(".//div")?[0];
+
+        return titleBlocks?.InnerHtml.RemoveLinks();
     }
 
     public async Task<string?> GetBookTextAsync(HtmlDocument bookDocument, string picturesPath)

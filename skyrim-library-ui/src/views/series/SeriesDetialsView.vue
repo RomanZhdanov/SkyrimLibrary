@@ -1,7 +1,14 @@
 <template>
   <div v-if="isLoading">Loading...</div>
   <div v-if="error" class="text-danger">{{ error }}</div>
-  <SeriesCard v-else :id="series.id" :name="series.name" :books="series.books" />
+  <SeriesCard
+    v-else
+    :id="series.id"
+    :name="series.name"
+    :author="series.author"
+    :description="series.description"
+    :books="series.books"
+  />
 </template>
 
 <script lang="ts">
@@ -30,7 +37,7 @@ export default defineComponent({
       console.log('are we loading?')
       this.isLoading = true
       try {
-        const { data } = await api.getSeries(Number(this.id))
+        const { data } = await api.getSeriesDetails(Number(this.id))
         this.series = data
       } catch (err: unknown) {
         const error = err as AxiosError

@@ -16,7 +16,27 @@ namespace SkyrimLibrary.WebAPI.Common.Extensions
             return htmlDoc.DocumentNode.InnerText;
         }
 
-        public static string RemoveLinks(this string html, string picturesUrl)
+        public static string UpdateImagesSrc(this string html, string imgUrl)
+        {
+            if (string.IsNullOrEmpty(html)) return string.Empty;
+
+            var document = new HtmlDocument();
+            document.LoadHtml(html);
+
+            HtmlNodeCollection imageNodes = document.DocumentNode.SelectNodes("//img");
+            if (imageNodes != null)
+            {
+                foreach (HtmlNode iamgeNode in imageNodes)
+                {
+                    string picture = iamgeNode.GetAttributeValue("src", "");
+                    iamgeNode.SetAttributeValue("src", imgUrl + picture);
+                }
+            }
+
+            return document.DocumentNode.OuterHtml;
+        }
+
+        public static string RemoveLinks(this string html)
         {
             if (string.IsNullOrEmpty(html)) return string.Empty;
 
@@ -28,25 +48,10 @@ namespace SkyrimLibrary.WebAPI.Common.Extensions
             {
                 foreach (HtmlNode anchorNode in anchorNodes)
                 {
-                    string innerText = anchorNode.InnerHtml; // Extract inner text
+                    string innerText = $"<span>{anchorNode.InnerHtml}</span>"; // Extract inner text
                     anchorNode.ParentNode.ReplaceChild(HtmlNode.CreateNode(innerText), anchorNode); // Replace anchor tag with inner text
                 }
-            }
-
-            HtmlNodeCollection imageNodes = document.DocumentNode.SelectNodes("//img");
-            if (imageNodes != null)
-            {
-                foreach (HtmlNode iamgeNode in imageNodes)
-                {
-                    //string innerText = iamgeNode.GetAttributeValue("title", ""); // Extract inner text
-                    //if (!string.IsNullOrEmpty(innerText))
-                    //{
-                    //    iamgeNode.ParentNode.ReplaceChild(HtmlNode.CreateNode(innerText), iamgeNode); // Replace anchor tag with inner text
-                    //}
-                    string picture = iamgeNode.GetAttributeValue("src", "");
-                    iamgeNode.SetAttributeValue("src", picturesUrl + picture);
-                }
-            }
+            }            
 
             return document.DocumentNode.OuterHtml;
         }

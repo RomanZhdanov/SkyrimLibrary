@@ -5,14 +5,14 @@ using SkyrimLibrary.WebAPI.Data;
 
 namespace SkyrimLibrary.WebAPI.Queries.GetBook
 {
-    public class GetBookQuery : IQuery<BookDTO>
+    public class GetBookReadQuery : IQuery<BookDTO>
     {
         public string BookId { get; set; }
 
-        public GetBookQuery(string id) => BookId = id;
+        public GetBookReadQuery(string id) => BookId = id;
     }
 
-    public class GetBookQueryHandler : IQueryHandler<GetBookQuery, BookDTO>
+    public class GetBookQueryHandler : IQueryHandler<GetBookReadQuery, BookDTO>
     {
         private readonly ApplicationDbContext _context;
         private readonly IHttpContextAccessor _httpContext;
@@ -23,7 +23,7 @@ namespace SkyrimLibrary.WebAPI.Queries.GetBook
             _httpContext = httpContext;
         }
 
-        public async Task<BookDTO> Handle(GetBookQuery query)
+        public async Task<BookDTO> Handle(GetBookReadQuery query)
         {
             var baseURL = _httpContext.HttpContext.Request.Host;
             var scheme = _httpContext.HttpContext.Request.Scheme;
@@ -36,9 +36,9 @@ namespace SkyrimLibrary.WebAPI.Queries.GetBook
             return new BookDTO
             {
                 Id = book.Id,
-                Title = book.Title,
+                Title = book.FullTitle,
                 Author = book.Author,
-                Text = book.Text?.RemoveLinks($"{scheme}://{baseURL}/img/pictures/")
+                Text = book.Text?.UpdateImagesSrc($"{scheme}://{baseURL}/img/pictures/")
             };
         }
     }

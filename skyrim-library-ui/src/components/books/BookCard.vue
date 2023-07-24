@@ -31,7 +31,7 @@
             >
             <router-link
               class="btn btn-primary ms-2 shadow-sm"
-              :to="readLink"
+              :to="'/series/' + series.id + '/read'"
               v-if="series"
               role="button"
               >Read series</router-link

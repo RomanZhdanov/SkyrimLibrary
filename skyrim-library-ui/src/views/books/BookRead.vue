@@ -1,7 +1,7 @@
 <template>
   <div v-if="book">
     <div class="text-center">
-      <h1>{{ book.title }}</h1>
+      <h1 v-html="book.title" />
       <p v-if="book.author">by {{ book.author }}</p>
     </div>
     <div v-html="book.text" />

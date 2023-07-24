@@ -6,6 +6,7 @@ using SkyrimLibrary.WebAPI.Queries.GetBooksPage;
 using SkyrimLibrary.WebAPI.Queries.GetBooksSearch;
 using SkyrimLibrary.WebAPI.Queries.GetSeries;
 using SkyrimLibrary.WebAPI.Queries.GetSeriesDetails;
+using SkyrimLibrary.WebAPI.Queries.GetSeriesRead;
 using SkyrimLibrary.WebAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +31,14 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+app.MapGet("/search/", async (string input, QueryDispatcher queryDispatcher) =>
+{
+    var query = new GetBooksSearchQuery(input);
+    var result = await queryDispatcher.DispatchAsync<GetBooksSearchQuery, SearchResult>(query);
+
+    return Results.Ok(result);
+});
+
 app.MapGet("/books/", async (int page, int pageSize, QueryDispatcher queryDispatcher) =>
 {
     var query = new GetBooksPageQuery { Page = page, PageSize = pageSize };
@@ -41,24 +50,22 @@ app.MapGet("/books/", async (int page, int pageSize, QueryDispatcher queryDispat
 
 app.MapGet("/books/{id}", async (string id, QueryDispatcher queryDispatcher) =>
 {
-    var query = new GetBookQuery(id.Trim());
-    var book = await queryDispatcher.DispatchAsync<GetBookQuery, SkyrimLibrary.WebAPI.Queries.GetBook.BookDTO>(query);
+    var query = new GetBookReadQuery(id.Trim());
+    var book = await queryDispatcher.DispatchAsync<GetBookReadQuery, SkyrimLibrary.WebAPI.Queries.GetBook.BookDTO>(query);
 
     if (book is null) return Results.NotFound($"Book with id '{query.BookId}' was not found.");
 
     return Results.Ok(book);
 });
 
-app.MapGet("/series/{id}", async (int id, QueryDispatcher queryDispatcher) =>
+app.MapGet("/books/{id}/details", async (string id, QueryDispatcher queryDispatcher) =>
 {
-    var series = await queryDispatcher
-        .DispatchAsync<GetSeriesDetailsQuery, SkyrimLibrary.WebAPI.Queries.GetSeriesDetails.SeriesDTO>(
-    new GetSeriesDetailsQuery(id)
-    );
+    var query = new GetBookDetailsQuery(id.Trim());
+    var book = await queryDispatcher.DispatchAsync<GetBookDetailsQuery, BookDetialsDTO>(query);
 
-    if (series is null) return Results.NotFound($"Series with id '{id}' was not found.");
+    if (book is null) return Results.NotFound($"Book with id '{query.BookId}' was not found.");
 
-    return Results.Ok(series);
+    return Results.Ok(book);
 });
 
 app.MapGet("/series/", async (QueryDispatcher queryDispatcher) =>
@@ -73,22 +80,28 @@ app.MapGet("/series/", async (QueryDispatcher queryDispatcher) =>
     return Results.Ok(series);
 });
 
-app.MapGet("/books/{id}/details", async (string id, QueryDispatcher queryDispatcher) =>
+app.MapGet("/series/{id}", async (int id, QueryDispatcher queryDispatcher) =>
 {
-    var query = new GetBookDetailsQuery(id.Trim());
-    var book = await queryDispatcher.DispatchAsync<GetBookDetailsQuery, BookDetialsDTO>(query);
+    var series = await queryDispatcher
+        .DispatchAsync<GetSeriesDetailsQuery, SkyrimLibrary.WebAPI.Queries.GetSeriesDetails.SeriesDTO>(
+    new GetSeriesDetailsQuery(id)
+    );
 
-    if (book is null) return Results.NotFound($"Book with id '{query.BookId}' was not found.");
+    if (series is null) return Results.NotFound($"Series with id '{id}' was not found.");
 
-    return Results.Ok(book);
+    return Results.Ok(series);
 });
 
-app.MapGet("/search/", async (string input, QueryDispatcher queryDispatcher) =>
+app.MapGet("/series/{id}/read", async (int id, QueryDispatcher queryDispatcher) =>
 {
-    var query = new GetBooksSearchQuery(input);
-    var result = await queryDispatcher.DispatchAsync<GetBooksSearchQuery, SearchResult>(query);
+    var series = await queryDispatcher
+        .DispatchAsync<GetSeriesReadQuery, SkyrimLibrary.WebAPI.Queries.GetSeriesRead.SeriesDTO>(
+    new GetSeriesReadQuery(id)
+    );
 
-    return Results.Ok(result);
+    if (series is null) return Results.NotFound($"Series with id '{id}' was not found.");
+
+    return Results.Ok(series);
 });
 
 // Configure the HTTP request pipeline.

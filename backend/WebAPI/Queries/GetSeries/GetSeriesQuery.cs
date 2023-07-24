@@ -27,6 +27,7 @@ namespace SkyrimLibrary.WebAPI.Queries.GetSeries
                 {
                     Id = s.Id,
                     Name = s.FullName,
+                    Description = s.Description,
                     BooksCount = s.Books.Count
                 }).ToListAsync();
         }

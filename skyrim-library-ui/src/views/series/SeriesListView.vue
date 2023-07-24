@@ -1,17 +1,18 @@
 <template>
   <h1 class="display-6">Books series</h1>
   <div v-if="isLoading">Loading...</div>
-  <div v-else class="list-group">
+  <div v-else>
     <router-link
       v-for="series in seriesList"
       :key="series.id"
       :to="'/series/' + series.id"
-      class="list-group-item list-group-item-action"
+      style="text-decoration: none"
     >
-      <div class="d-flex w-100 justify-content-between">
-        <div>{{ series.name }}</div>
-        <small>{{ series.booksCount }} tomes</small>
-      </div>
+      <SeriesListItem
+        :name="series.name"
+        :description="series.description"
+        :books-count="series.booksCount"
+      />
     </router-link>
   </div>
 </template>
@@ -19,7 +20,8 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useSeriesListStore } from '@/stores/seriesList'
-import type { SeriesListItem } from '@/types/seriesTypes'
+import type { SeriesListItemType } from '@/types/seriesTypes'
+import SeriesListItem from '@/components/series/SeriesListItem.vue'
 
 export default defineComponent({
   data() {
@@ -29,8 +31,11 @@ export default defineComponent({
       listStore: useSeriesListStore()
     }
   },
+  components: {
+    SeriesListItem
+  },
   computed: {
-    seriesList(): SeriesListItem[] {
+    seriesList(): SeriesListItemType[] {
       return this.listStore.seriesList
     }
   },

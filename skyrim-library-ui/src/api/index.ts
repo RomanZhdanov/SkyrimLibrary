@@ -1,6 +1,6 @@
 import axios from 'axios'
 import type { Book, BookPageResult, BookDetails, BookSearchResult } from '@/types/bookTypes'
-import type { SeriesDetails, SeriesListItem } from '@/types/seriesTypes'
+import type { SeriesRead, SeriesDetails, SeriesListItemType } from '@/types/seriesTypes'
 
 const http = axios.create({
   baseURL: import.meta.env.VITE_API_URL
@@ -8,9 +8,11 @@ const http = axios.create({
 
 export const get = async (id: string) => await http.get<Book>(`/books/${id}`)
 
-export const getSeriesList = async () => await http.get<SeriesListItem[]>('/series/')
+export const getSeriesList = async () => await http.get<SeriesListItemType[]>('/series/')
 
-export const getSeries = async (id: number) => await http.get<SeriesDetails>(`/series/${id}`)
+export const getSeriesDetails = async (id: number) => await http.get<SeriesDetails>(`/series/${id}`)
+
+export const getSeriesRead = async (id: number) => await http.get<SeriesRead>(`/series/${id}/read`)
 
 export const getDetails = async (id: string) => await http.get<BookDetails>(`/books/${id}/details`)
 

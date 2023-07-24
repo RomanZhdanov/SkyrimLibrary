@@ -32,11 +32,17 @@ namespace SkyrimLibrary.WebAPI.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("FullTitle")
+                        .HasColumnType("TEXT");
+
                     b.Property<int?>("SeriesId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("SeriesOrder")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("SeriesTitle")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Text")
                         .HasColumnType("TEXT");

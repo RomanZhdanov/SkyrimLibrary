@@ -16,7 +16,10 @@ namespace SkyrimLibrary.WebAPI.Data.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", nullable: false)
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    FullName = table.Column<string>(type: "TEXT", nullable: false),
+                    Author = table.Column<string>(type: "TEXT", nullable: true),
+                    Description = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -30,11 +33,14 @@ namespace SkyrimLibrary.WebAPI.Data.Migrations
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     SeriesId = table.Column<int>(type: "INTEGER", nullable: true),
                     Title = table.Column<string>(type: "TEXT", nullable: false),
+                    FullTitle = table.Column<string>(type: "TEXT", nullable: true),
                     Text = table.Column<string>(type: "TEXT", nullable: true),
                     Author = table.Column<string>(type: "TEXT", nullable: true),
                     Description = table.Column<string>(type: "TEXT", nullable: true),
                     Type = table.Column<string>(type: "TEXT", nullable: true),
-                    CoverImage = table.Column<string>(type: "TEXT", nullable: false)
+                    CoverImage = table.Column<string>(type: "TEXT", nullable: false),
+                    SeriesOrder = table.Column<int>(type: "INTEGER", nullable: true),
+                    SeriesTitle = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {

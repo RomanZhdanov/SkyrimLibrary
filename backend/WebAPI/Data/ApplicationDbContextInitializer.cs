@@ -1,16 +1,23 @@
 ﻿using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
+using SkyrimLibrary.WebAPI.Common.Extensions;
 using SkyrimLibrary.WebAPI.Models;
 using SkyrimLibrary.WebAPI.Services;
 
 namespace SkyrimLibrary.WebAPI.Data
 {
+    public record BookSeriesData
+    {
+        public string Url { get; set; }
+
+        public string MyProperty { get; set; }
+    }
     public class ApplicationDbContextInitializer
     {
         private readonly ILogger<ApplicationDbContextInitializer> _logger;
         private readonly ApplicationDbContext _context;
         private readonly BooksParser _booksParser;
-        private readonly Dictionary<int, string[]> _seriesBooksUrlDirctionary = new ();
+        private readonly Dictionary<int, (string url,string title)[]> _seriesBooksUrlDirctionary = new ();
 
         public ApplicationDbContextInitializer(ILogger<ApplicationDbContextInitializer> logger, ApplicationDbContext context, BooksParser booksParser)
         {
@@ -52,6 +59,11 @@ namespace SkyrimLibrary.WebAPI.Data
         {
             if (!_context.Books.Any())
             {
+                if (_context.Series.Any())
+                {
+                    await _context.Series.ExecuteDeleteAsync();
+                }
+
                 var books = await GetBookData(rootPath);
 
                 _context.Books.AddRange(books);
@@ -83,44 +95,49 @@ namespace SkyrimLibrary.WebAPI.Data
                     var coverImage = await _booksParser.GetBookCoverImageAsync(imageUrl, coverSavePath);
                     var bookLink = bookRows[i].SelectSingleNode(".//td[2]//a[1]");
                     var bookUrl = bookLink.GetAttributeValue("href", "");
-                    var title = bookLink?.InnerText;
 
-                    var bookPageHtml = await _booksParser.GetHtmlPageAsync(bookUrl);
-                    var bookDocoument = new HtmlDocument();
-                    bookDocoument.LoadHtml(bookPageHtml);
-
-                    var text = await _booksParser.GetBookTextAsync(bookDocoument, picturesPath);
-                    var (bookSeries, seriesUrl) = _booksParser.GetBookSeries(bookDocoument);
-                    int? seriesId = null;
-                    int? seriesOrder = null;
-                    
-                    if (bookSeries is not null && seriesUrl is not null)
-                    {
-                        seriesId = await GetSeriesIdAsync(bookSeries, seriesUrl);
-
-                        seriesOrder = _seriesBooksUrlDirctionary[seriesId.Value]
-                            .Select((url, i) => new { i, url })
-                            .Where((b => b.url == bookUrl))
-                            .Select(b => b.i + 1)
-                            .FirstOrDefault();
-                    }
 
                     var id = bookRows[i].SelectSingleNode(".//span[@class='idall']").InnerText;
                     var author = bookRows[i].SelectSingleNode(".//td[4]")?.InnerText;
                     var description = bookRows[i].SelectSingleNode(".//td[5]")?.InnerText;
                     var type = bookRows[i].SelectSingleNode(".//td[6]")?.InnerText;
+                    var title = bookLink?.InnerText;
+
+                    var bookPageHtml = await _booksParser.GetHtmlPageAsync(bookUrl);
+                    var bookDocument = new HtmlDocument();
+                    bookDocument.LoadHtml(bookPageHtml);
+
+                    var text = await _booksParser.GetBookTextAsync(bookDocument, picturesPath);
+                    var fullTitle = _booksParser.GetBookFullTitle(bookDocument);
+                    var (bookSeries, seriesUrl) = _booksParser.GetBookSeries(bookDocument);
+                    int? seriesId = null;
+                    int? seriesOrder = null;
+                    string seriesTitle = null;
+                    
+                    if (bookSeries is not null && seriesUrl is not null)
+                    {
+                        seriesId = await GetSeriesIdAsync(bookSeries, seriesUrl);
+
+                        (seriesOrder, seriesTitle) = _seriesBooksUrlDirctionary[seriesId.Value]
+                            .Select((book, i) => new { i, book })
+                            .Where((b => b.book.url == bookUrl))
+                            .Select(b => (b.i + 1, b.book.title))
+                            .FirstOrDefault();
+                    }
 
                     books.Add(new Book
                     {
                         Id = id,
                         Title = title,
-                        Text = text,
+                        FullTitle = fullTitle,
+                        Text = text.RemoveLinks(),
                         Author = author,
                         Description = description,
                         Type = type,
+                        CoverImage = coverImage,
                         SeriesId = seriesId,
                         SeriesOrder = seriesOrder,
-                        CoverImage = coverImage
+                        SeriesTitle = seriesTitle
                     });
 
                     _logger.LogInformation($"Book #{i} {title} hase been added");
@@ -151,7 +168,7 @@ namespace SkyrimLibrary.WebAPI.Data
             return series.Id;
         }
 
-        private async Task<(Series, string[])> GetSeriesData(string seriesUrl)
+        private async Task<(Series, (string, string)[])> GetSeriesData(string seriesUrl)
         {
             var seriesHtml = await _booksParser.GetHtmlPageAsync(seriesUrl);
 
@@ -161,17 +178,18 @@ namespace SkyrimLibrary.WebAPI.Data
             try
             {
                 var books = seriesDoc.DocumentNode.SelectNodes("//span[@class='mw-headline']");
-                string[] booksUrl = new string[books.Count];
+                (string url, string title)[] booksUrl = new (string, string)[books.Count];
 
                 for (int i = 0; i < books.Count; i++)
                 {
-                    booksUrl[i] = books[i].SelectSingleNode(".//a")?.GetAttributeValue("href", "");
+                    booksUrl[i].url = books[i].SelectSingleNode(".//a")?.GetAttributeValue("href", "");
+                    booksUrl[i].title = books[i].SelectSingleNode(".//a")?.InnerText;
                 }
 
                 var titleBlocks = seriesDoc.DocumentNode
                 .SelectSingleNode("//div[@class='mw-parser-output']")
                 .SelectNodes(".//div")[0]
-                .SelectNodes("./div");
+                .SelectNodes(".//div");
 
                 var title = titleBlocks[0].InnerText;
                 string? author = null;
@@ -179,7 +197,7 @@ namespace SkyrimLibrary.WebAPI.Data
 
                 if (titleBlocks.Count == 3)
                 {
-                    author = titleBlocks[1].InnerText;
+                    author = titleBlocks[1].InnerText.Remove(0, 3);
                     description = titleBlocks[2].InnerText;
                 }
                 else
