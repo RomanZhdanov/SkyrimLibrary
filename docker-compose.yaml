@@ -1,0 +1,35 @@
+version: "3"
+services:
+  reindexer:
+    image: reindexer/reindexer:latest
+    ports:
+      - 9088:9088
+    networks:
+      - sky-lib-network
+  backend:
+    build: ./backend
+    ports:
+      - 5000:8080
+    volumes:
+      - /home/skyrim/data:/app/Data
+      - /home/skyrim/data:/app/wwwroot
+    environment:
+      - name=value
+    networks:
+      - sky-lib-network
+    depends_on:
+      - reindexer
+  forntend:
+    build: ./skyrim-library-ui
+    ports:
+      - 8000:80
+    networks:
+      - sky-lib-network
+    depends_on:
+      - backend
+
+networks:
+  sky-lib-network:
+    driver: bridge
+    ipam:
+      driver: default
