@@ -24,9 +24,9 @@
           <li class="nav-item">
             <router-link class="nav-link" to="/series">Series</router-link>
           </li>
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <router-link class="nav-link" to="/authors">Authors</router-link>
-          </li>
+          </li> -->
         </ul>
       </div>
     </div>
