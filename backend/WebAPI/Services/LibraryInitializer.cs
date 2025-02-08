@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Processing;
 using SkyrimLibrary.WebAPI.Data;
 using SkyrimLibrary.WebAPI.Models;
 
@@ -24,6 +26,11 @@ internal class LibraryInitializer
 
     public async Task Run()
     {
+        // if (string.IsNullOrWhiteSpace(_hostingEnvironment.WebRootPath))
+        // {
+        //     _hostingEnvironment.WebRootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+        // }
+        
         await _applicationDbContextInitializer.InitialiseAsync();
         await _applicationDbContextInitializer.SeedAsync(_hostingEnvironment.WebRootPath);
         await InitSearchEngine();
@@ -38,7 +45,7 @@ internal class LibraryInitializer
 
             if (!result.Succeeded)
             {
-                _logger.LogWarning("Неудачная инициализация поисковой службы:", String.Join(" ", result.Errors));
+                _logger.LogWarning("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ:", String.Join(" ", result.Errors));
                 return;
             }
 
@@ -58,7 +65,7 @@ internal class LibraryInitializer
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Во время инициализации поисковой службы возникло исключение!");
+            _logger.LogError(ex, "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ!");
 
             throw;
         }
